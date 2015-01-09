@@ -16,6 +16,7 @@ RUN apt-get update \
 		libapr1 \
 		libaprutil1 \
 		libpcre++0 \
+		libssl1.0.0 \
 	&& rm -r /var/lib/apt/lists/*
 
 # see https://httpd.apache.org/download.cgi#verify
@@ -24,16 +25,21 @@ RUN gpg --keyserver pgp.mit.edu --recv-keys A93D62ECC3C8EA12DB220EC934EA76E67914
 ENV HTTPD_VERSION 2.4.10
 ENV HTTPD_BZ2_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
-		build-essential \
+RUN buildDeps=' \
 		ca-certificates \
 		curl \
+		bzip2 \
 		gcc \
 		libapr1-dev \
 		libaprutil1-dev \
+		libc6-dev \
 		libpcre++-dev \
+		libssl-dev \
 		make \
+	' \
+	set -x \
+	&& apt-get update \
+	&& apt-get install -y --no-install-recommends $buildDeps \
 	&& rm -r /var/lib/apt/lists/* \
 	&& curl -SL "$HTTPD_BZ2_URL" -o httpd.tar.bz2 \
 	&& curl -SL "$HTTPD_BZ2_URL.asc" -o httpd.tar.bz2.asc \
@@ -42,7 +48,7 @@ RUN apt-get update \
 	&& tar -xvf httpd.tar.bz2 -C src/httpd --strip-components=1 \
 	&& rm httpd.tar.bz2* \
 	&& cd src/httpd \
-	&& ./configure --enable-so --prefix=$HTTPD_PREFIX \
+	&& ./configure --enable-so --enable-ssl --prefix=$HTTPD_PREFIX \
 	&& make -j"$(nproc)" \
 	&& make install \
 	&& cd ../../ \
@@ -51,15 +57,7 @@ RUN apt-get update \
 		s!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g; \
 		s!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g; \
 		' /usr/local/apache2/conf/httpd.conf \
-	&& apt-get purge -y --auto-remove \
-		build-essential \
-		ca-certificates \
-		curl \
-		gcc \
-		libapr1-dev \
-		libaprutil1-dev \
-		libpcre++-dev \
-		make
+	&& apt-get purge -y --auto-remove $buildDeps
 
 EXPOSE 80
 CMD ["httpd", "-DFOREGROUND"]
