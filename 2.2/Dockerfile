@@ -61,5 +61,7 @@ RUN apt-get update \
 		libpcre++-dev \
 		make
 
+COPY httpd-foreground /usr/local/bin/
+
 EXPOSE 80
-CMD ["httpd", "-DFOREGROUND"]
+CMD ["httpd-foreground"]
