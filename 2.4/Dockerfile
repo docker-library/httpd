@@ -59,5 +59,7 @@ RUN buildDeps=' \
 		' /usr/local/apache2/conf/httpd.conf \
 	&& apt-get purge -y --auto-remove $buildDeps
 
+COPY httpd-foreground /usr/local/bin/
+
 EXPOSE 80
-CMD ["httpd", "-DFOREGROUND"]
+CMD ["httpd-foreground"]
