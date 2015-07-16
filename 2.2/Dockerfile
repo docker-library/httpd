@@ -22,7 +22,7 @@ RUN apt-get update \
 # see https://httpd.apache.org/download.cgi#verify
 RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B1B96F45DFBDCCF974019235193F180AB55D9977
 
-ENV HTTPD_VERSION 2.2.29
+ENV HTTPD_VERSION 2.2.31
 ENV HTTPD_BZ2_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 
 RUN buildDeps=' \
