@@ -25,12 +25,12 @@ RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys A93D62ECC3C8EA12DB220
 ENV HTTPD_VERSION 2.4.17
 ENV HTTPD_BZ2_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 
+# libapr/aprutil are needed for apxs, and libc6-dev is a dependency of those
 RUN buildDeps=' \
 		ca-certificates \
 		curl \
 		bzip2 \
 		gcc \
-		libc6-dev \
 		libpcre++-dev \
 		libssl-dev \
 		make \
@@ -38,6 +38,7 @@ RUN buildDeps=' \
 	keepBuildDeps=' \
 		libapr1-dev \
 		libaprutil1-dev \
+		libc6-dev \
 	' \
 	set -x \
 	&& apt-get update \
