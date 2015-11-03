@@ -15,6 +15,8 @@ RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
 		libapr1 \
 		libaprutil1 \
+		libapr1-dev \
+		libaprutil1-dev \
 		libpcre++0 \
 		libssl1.0.0 \
 	&& rm -r /var/lib/apt/lists/*
@@ -25,7 +27,6 @@ RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B1B96F45DFBDCCF974019
 ENV HTTPD_VERSION 2.2.31
 ENV HTTPD_BZ2_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 
-# libapr/aprutil are needed for apxs, and libc6-dev is a dependency of those
 RUN buildDeps=' \
 		ca-certificates \
 		curl \
@@ -35,14 +36,9 @@ RUN buildDeps=' \
 		libssl-dev \
 		make \
 	' \
-	keepBuildDeps=' \
-		libapr1-dev \
-		libaprutil1-dev \
-		libc6-dev \
-	' \
 	set -x \
 	&& apt-get update \
-	&& apt-get install -y --no-install-recommends $buildDeps $keepBuildDeps \
+	&& apt-get install -y --no-install-recommends $buildDeps \
 	&& rm -r /var/lib/apt/lists/* \
 	&& curl -SL "$HTTPD_BZ2_URL" -o httpd.tar.bz2 \
 	&& curl -SL "$HTTPD_BZ2_URL.asc" -o httpd.tar.bz2.asc \
