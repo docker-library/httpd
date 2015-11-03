@@ -15,6 +15,8 @@ RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
 		libapr1 \
 		libaprutil1 \
+		libapr1-dev \
+		libaprutil1-dev \
 		libpcre++0 \
 		libssl1.0.0 \
 	&& rm -r /var/lib/apt/lists/*
@@ -30,9 +32,6 @@ RUN buildDeps=' \
 		curl \
 		bzip2 \
 		gcc \
-		libapr1-dev \
-		libaprutil1-dev \
-		libc6-dev \
 		libpcre++-dev \
 		libssl-dev \
 		make \
