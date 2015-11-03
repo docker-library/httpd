@@ -30,16 +30,18 @@ RUN buildDeps=' \
 		curl \
 		bzip2 \
 		gcc \
-		libapr1-dev \
-		libaprutil1-dev \
 		libc6-dev \
 		libpcre++-dev \
 		libssl-dev \
 		make \
 	' \
+	keepBuildDeps=' \
+		libapr1-dev \
+		libaprutil1-dev \
+	' \
 	set -x \
 	&& apt-get update \
-	&& apt-get install -y --no-install-recommends $buildDeps \
+	&& apt-get install -y --no-install-recommends $buildDeps $keepBuildDeps \
 	&& rm -r /var/lib/apt/lists/* \
 	&& curl -SL "$HTTPD_BZ2_URL" -o httpd.tar.bz2 \
 	&& curl -SL "$HTTPD_BZ2_URL.asc" -o httpd.tar.bz2.asc \
