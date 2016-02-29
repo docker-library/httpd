@@ -21,9 +21,6 @@ RUN apt-get update \
 		libssl1.0.0 \
 	&& rm -r /var/lib/apt/lists/*
 
-# see https://httpd.apache.org/download.cgi#verify
-RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B1B96F45DFBDCCF974019235193F180AB55D9977
-
 ENV HTTPD_VERSION 2.2.31
 ENV HTTPD_BZ2_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 
@@ -40,12 +37,16 @@ RUN buildDeps=' \
 	&& apt-get update \
 	&& apt-get install -y --no-install-recommends $buildDeps \
 	&& rm -r /var/lib/apt/lists/* \
-	&& curl -SL "$HTTPD_BZ2_URL" -o httpd.tar.bz2 \
-	&& curl -SL "$HTTPD_BZ2_URL.asc" -o httpd.tar.bz2.asc \
-	&& gpg --verify httpd.tar.bz2.asc \
+	&& curl -fSL "$HTTPD_BZ2_URL" -o httpd.tar.bz2 \
+	&& curl -fSL "$HTTPD_BZ2_URL.asc" -o httpd.tar.bz2.asc \
+# see https://httpd.apache.org/download.cgi#verify
+	&& export GNUPGHOME="$(mktemp -d)" \
+	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B1B96F45DFBDCCF974019235193F180AB55D9977 \
+	&& gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2 \
+	&& rm -r "$GNUPGHOME" httpd.tar.bz2.asc \
 	&& mkdir -p src/httpd \
 	&& tar -xvf httpd.tar.bz2 -C src/httpd --strip-components=1 \
-	&& rm httpd.tar.bz2* \
+	&& rm httpd.tar.bz2 \
 	&& cd src/httpd \
 	&& ./configure --enable-so --enable-ssl --prefix=$HTTPD_PREFIX --enable-mods-shared=most \
 	&& make -j"$(nproc)" \
