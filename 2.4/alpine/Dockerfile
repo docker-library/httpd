@@ -1,7 +1,8 @@
 FROM alpine:3.3
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
-RUN adduser -D www-data
+RUN addgroup -g 82 -S www-data \
+	&& adduser -u 82 -D -S -G www-data www-data
 
 ENV HTTPD_PREFIX /usr/local/apache2
 ENV PATH $PATH:$HTTPD_PREFIX/bin
