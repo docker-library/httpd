@@ -15,6 +15,7 @@ RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
 		libapr1 \
 		libaprutil1 \
+		libaprutil1-ldap \
 		libapr1-dev \
 		libaprutil1-dev \
 		libpcre++0 \
