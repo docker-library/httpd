@@ -49,7 +49,9 @@ RUN buildDeps=' \
 	&& tar -xvf httpd.tar.bz2 -C src/httpd --strip-components=1 \
 	&& rm httpd.tar.bz2 \
 	&& cd src/httpd \
-	&& ./configure --enable-so --enable-ssl --prefix=$HTTPD_PREFIX --enable-mods-shared=most \
+	&& ./configure \
+		--prefix=$HTTPD_PREFIX \
+		--enable-mods-shared=reallyall \
 	&& make -j"$(nproc)" \
 	&& make install \
 	&& cd ../../ \

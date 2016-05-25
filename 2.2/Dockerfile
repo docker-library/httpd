@@ -49,7 +49,11 @@ RUN buildDeps=' \
 	&& tar -xvf httpd.tar.bz2 -C src/httpd --strip-components=1 \
 	&& rm httpd.tar.bz2 \
 	&& cd src/httpd \
-	&& ./configure --enable-so --enable-ssl --prefix=$HTTPD_PREFIX --enable-mods-shared=most \
+	&& ./configure \
+		--prefix=$HTTPD_PREFIX \
+# https://httpd.apache.org/docs/2.2/programs/configure.html
+# Caveat: --enable-mods-shared=all does not actually build all modules. To build all modules then, one might use:
+		--enable-mods-shared='all ssl ldap cache proxy authn_alias mem_cache file_cache authnz_ldap charset_lite dav_lock disk_cache' \
 	&& make -j"$(nproc)" \
 	&& make install \
 	&& cd ../../ \
