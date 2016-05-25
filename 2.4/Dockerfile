@@ -38,6 +38,7 @@ RUN buildDeps=' \
 	&& apt-get update \
 	&& apt-get install -y --no-install-recommends $buildDeps \
 	&& rm -r /var/lib/apt/lists/* \
+	\
 	&& curl -fSL "$HTTPD_BZ2_URL" -o httpd.tar.bz2 \
 	&& curl -fSL "$HTTPD_BZ2_URL.asc" -o httpd.tar.bz2.asc \
 # see https://httpd.apache.org/download.cgi#verify
@@ -45,19 +46,26 @@ RUN buildDeps=' \
 	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys A93D62ECC3C8EA12DB220EC934EA76E6791485A8 \
 	&& gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2 \
 	&& rm -r "$GNUPGHOME" httpd.tar.bz2.asc \
-	&& mkdir -p src/httpd \
-	&& tar -xvf httpd.tar.bz2 -C src/httpd --strip-components=1 \
+	\
+	&& mkdir -p src \
+	&& tar -xvf httpd.tar.bz2 -C src --strip-components=1 \
 	&& rm httpd.tar.bz2 \
-	&& cd src/httpd \
-	&& ./configure --enable-so --enable-ssl --prefix=$HTTPD_PREFIX --enable-mods-shared=most \
+	&& cd src \
+	\
+	&& ./configure \
+		--prefix="$HTTPD_PREFIX" \
+		--enable-mods-shared=reallyall \
 	&& make -j"$(nproc)" \
 	&& make install \
-	&& cd ../../ \
-	&& rm -r src/httpd \
-	&& sed -ri ' \
-		s!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g; \
-		s!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g; \
-		' /usr/local/apache2/conf/httpd.conf \
+	\
+	&& cd .. \
+	&& rm -r src \
+	\
+	&& sed -ri \
+		-e 's!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g' \
+		-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
+		"$HTTPD_PREFIX/conf/httpd.conf" \
+	\
 	&& apt-get purge -y --auto-remove $buildDeps
 
 COPY httpd-foreground /usr/local/bin/
