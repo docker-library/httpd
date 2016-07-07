@@ -3,15 +3,17 @@ services: docker
 
 env:
   - VERSION=2.4
+  - VERSION=2.4 VARIANT=alpine
   - VERSION=2.2
+  - VERSION=2.2 VARIANT=alpine
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
 
 before_script:
   - env | sort
-  - cd "$VERSION"
-  - image="httpd:$VERSION"
+  - cd "$VERSION/$VARIANT"
+  - image="httpd:${VERSION}${VARIANT:+-$VARIANT}"
 
 script:
   - docker build -t "$image" .

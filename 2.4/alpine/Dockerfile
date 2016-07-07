@@ -1,7 +1,13 @@
-FROM debian:jessie
+FROM alpine:3.4
 
-# add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
-#RUN groupadd -r www-data && useradd -r --create-home -g www-data www-data
+# ensure www-data user exists
+RUN set -x \
+	&& addgroup -g 82 -S www-data \
+	&& adduser -u 82 -D -S -G www-data www-data
+# 82 is the standard uid/gid for "www-data" in Alpine
+# http://git.alpinelinux.org/cgit/aports/tree/main/apache2/apache2.pre-install?h=v3.3.2
+# http://git.alpinelinux.org/cgit/aports/tree/main/lighttpd/lighttpd.pre-install?h=v3.3.2
+# http://git.alpinelinux.org/cgit/aports/tree/main/nginx-initscripts/nginx-initscripts.pre-install?h=v3.3.2
 
 ENV HTTPD_PREFIX /usr/local/apache2
 ENV PATH $HTTPD_PREFIX/bin:$PATH
@@ -9,36 +15,27 @@ RUN mkdir -p "$HTTPD_PREFIX" \
 	&& chown www-data:www-data "$HTTPD_PREFIX"
 WORKDIR $HTTPD_PREFIX
 
-# install httpd runtime dependencies
-# https://httpd.apache.org/docs/2.4/install.html#requirements
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
-		libapr1 \
-		libaprutil1 \
-		libaprutil1-ldap \
-		libapr1-dev \
-		libaprutil1-dev \
-		libpcre++0 \
-		libssl1.0.0 \
-	&& rm -r /var/lib/apt/lists/*
-
 ENV HTTPD_VERSION 2.4.23
 ENV HTTPD_SHA1 5101be34ac4a509b245adb70a56690a84fcc4e7f
 ENV HTTPD_BZ2_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 
+# see https://httpd.apache.org/docs/2.4/install.html#requirements
 RUN set -x \
-	&& buildDeps=' \
-		bzip2 \
+	&& runDeps=' \
+		apr-dev \
+		apr-util-dev \
+	' \
+	&& apk add --no-cache --virtual .build-deps \
+		$runDeps \
 		ca-certificates \
 		gcc \
-		libpcre++-dev \
-		libssl-dev \
+		gnupg \
+		libc-dev \
 		make \
-		wget \
-	' \
-	&& apt-get update \
-	&& apt-get install -y --no-install-recommends $buildDeps \
-	&& rm -r /var/lib/apt/lists/* \
+		openssl \
+		openssl-dev \
+		pcre-dev \
+		tar \
 	\
 	&& wget -O httpd.tar.bz2 "$HTTPD_BZ2_URL" \
 	&& echo "$HTTPD_SHA1 *httpd.tar.bz2" | sha1sum -c - \
@@ -57,7 +54,7 @@ RUN set -x \
 	&& ./configure \
 		--prefix="$HTTPD_PREFIX" \
 		--enable-mods-shared=reallyall \
-	&& make -j"$(nproc)" \
+	&& make -j"$(getconf _NPROCESSORS_ONLN)" \
 	&& make install \
 	\
 	&& cd .. \
@@ -68,7 +65,15 @@ RUN set -x \
 		-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
 		"$HTTPD_PREFIX/conf/httpd.conf" \
 	\
-	&& apt-get purge -y --auto-remove $buildDeps
+	&& runDeps="$runDeps $( \
+		scanelf --needed --nobanner --recursive /usr/local \
+			| awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+			| sort -u \
+			| xargs -r apk info --installed \
+			| sort -u \
+	)" \
+	&& apk add --virtual .httpd-rundeps $runDeps \
+	&& apk del .build-deps
 
 COPY httpd-foreground /usr/local/bin/
 
