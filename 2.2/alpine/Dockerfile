@@ -15,8 +15,8 @@ RUN mkdir -p "$HTTPD_PREFIX" \
 	&& chown www-data:www-data "$HTTPD_PREFIX"
 WORKDIR $HTTPD_PREFIX
 
-ENV HTTPD_VERSION 2.4.23
-ENV HTTPD_SHA1 5101be34ac4a509b245adb70a56690a84fcc4e7f
+ENV HTTPD_VERSION 2.2.31
+ENV HTTPD_SHA1 e3b55387112206307ba76526820a2627472f3787
 ENV HTTPD_BZ2_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 
 # see https://httpd.apache.org/docs/2.4/install.html#requirements
@@ -42,7 +42,7 @@ RUN set -x \
 # see https://httpd.apache.org/download.cgi#verify
 	&& wget -O httpd.tar.bz2.asc "$HTTPD_BZ2_URL.asc" \
 	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys A93D62ECC3C8EA12DB220EC934EA76E6791485A8 \
+	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B1B96F45DFBDCCF974019235193F180AB55D9977 \
 	&& gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2 \
 	&& rm -r "$GNUPGHOME" httpd.tar.bz2.asc \
 	\

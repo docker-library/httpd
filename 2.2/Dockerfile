@@ -4,7 +4,7 @@ FROM debian:jessie
 #RUN groupadd -r www-data && useradd -r --create-home -g www-data www-data
 
 ENV HTTPD_PREFIX /usr/local/apache2
-ENV PATH $PATH:$HTTPD_PREFIX/bin
+ENV PATH $HTTPD_PREFIX/bin:$PATH
 RUN mkdir -p "$HTTPD_PREFIX" \
 	&& chown www-data:www-data "$HTTPD_PREFIX"
 WORKDIR $HTTPD_PREFIX
@@ -23,25 +23,27 @@ RUN apt-get update \
 	&& rm -r /var/lib/apt/lists/*
 
 ENV HTTPD_VERSION 2.2.31
+ENV HTTPD_SHA1 e3b55387112206307ba76526820a2627472f3787
 ENV HTTPD_BZ2_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 
-RUN buildDeps=' \
-		ca-certificates \
-		curl \
+RUN set -x \
+	&& buildDeps=' \
 		bzip2 \
+		ca-certificates \
 		gcc \
 		libpcre++-dev \
 		libssl-dev \
 		make \
+		wget \
 	' \
-	set -x \
 	&& apt-get update \
 	&& apt-get install -y --no-install-recommends $buildDeps \
 	&& rm -r /var/lib/apt/lists/* \
 	\
-	&& curl -fSL "$HTTPD_BZ2_URL" -o httpd.tar.bz2 \
-	&& curl -fSL "$HTTPD_BZ2_URL.asc" -o httpd.tar.bz2.asc \
+	&& wget -O httpd.tar.bz2 "$HTTPD_BZ2_URL" \
+	&& echo "$HTTPD_SHA1 *httpd.tar.bz2" | sha1sum -c - \
 # see https://httpd.apache.org/download.cgi#verify
+	&& wget -O httpd.tar.bz2.asc "$HTTPD_BZ2_URL.asc" \
 	&& export GNUPGHOME="$(mktemp -d)" \
 	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B1B96F45DFBDCCF974019235193F180AB55D9977 \
 	&& gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2 \
