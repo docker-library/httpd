@@ -24,6 +24,7 @@ RUN set -x \
 	&& runDeps=' \
 		apr-dev \
 		apr-util-dev \
+		perl \
 	' \
 	&& apk add --no-cache --virtual .build-deps \
 		$runDeps \
