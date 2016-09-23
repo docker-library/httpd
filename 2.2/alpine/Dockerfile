@@ -17,9 +17,12 @@ WORKDIR $HTTPD_PREFIX
 
 ENV HTTPD_VERSION 2.2.31
 ENV HTTPD_SHA1 e3b55387112206307ba76526820a2627472f3787
-ENV HTTPD_BZ2_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 
-# see https://httpd.apache.org/docs/2.4/install.html#requirements
+# https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
+ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename=httpd/httpd-$HTTPD_VERSION.tar.bz2
+# not all the mirrors actually carry the .asc files :'(
+ENV HTTPD_ASC_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2.asc
+
 RUN set -x \
 	&& runDeps=' \
 		apr-dev \
@@ -41,7 +44,7 @@ RUN set -x \
 	&& wget -O httpd.tar.bz2 "$HTTPD_BZ2_URL" \
 	&& echo "$HTTPD_SHA1 *httpd.tar.bz2" | sha1sum -c - \
 # see https://httpd.apache.org/download.cgi#verify
-	&& wget -O httpd.tar.bz2.asc "$HTTPD_BZ2_URL.asc" \
+	&& wget -O httpd.tar.bz2.asc "$HTTPD_ASC_URL" \
 	&& export GNUPGHOME="$(mktemp -d)" \
 	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B1B96F45DFBDCCF974019235193F180AB55D9977 \
 	&& gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2 \
