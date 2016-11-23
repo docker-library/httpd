@@ -57,12 +57,14 @@ RUN set -x \
 	\
 	&& ./configure \
 		--prefix="$HTTPD_PREFIX" \
-		--enable-mods-shared=reallyall \
+# https://httpd.apache.org/docs/2.2/programs/configure.html
+# Caveat: --enable-mods-shared=all does not actually build all modules. To build all modules then, one might use:
+		--enable-mods-shared='all ssl ldap cache proxy authn_alias mem_cache file_cache authnz_ldap charset_lite dav_lock disk_cache' \
 	&& make -j"$(getconf _NPROCESSORS_ONLN)" \
 	&& make install \
 	\
 	&& cd .. \
-	&& rm -r src \
+	&& rm -r src build man manual \
 	\
 	&& sed -ri \
 		-e 's!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g' \
