@@ -63,7 +63,7 @@ RUN set -x \
 	&& make install \
 	\
 	&& cd .. \
-	&& rm -r src \
+	&& rm -r src build man manual \
 	\
 	&& sed -ri \
 		-e 's!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g' \
