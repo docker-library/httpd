@@ -36,11 +36,21 @@ RUN set -x \
 		gcc \
 		gnupg \
 		libc-dev \
+		# mod_proxy_html mod_xml2enc
+		libxml2-dev \
+		# mod_lua
+		lua-dev \
 		make \
+		# no mod_session_crypto: openssl-dev in alpine doesn't work, but libressl is edge only (and brings conflicts with edge packages)
 		openssl \
 		openssl-dev \
 		pcre-dev \
 		tar \
+		zlib-dev \
+	# https://bugs.alpinelinux.org/issues/6375
+	&& echo '@edge http://dl-cdn.alpinelinux.org/alpine/edge/main' >> /etc/apk/repositories \
+	# mod_http2
+	&& apk add --no-cache nghttp2-dev@edge \
 	\
 	&& wget -O httpd.tar.bz2 "$HTTPD_BZ2_URL" \
 	&& echo "$HTTPD_SHA1 *httpd.tar.bz2" | sha1sum -c - \
@@ -52,7 +62,7 @@ RUN set -x \
 	&& rm -r "$GNUPGHOME" httpd.tar.bz2.asc \
 	\
 	&& mkdir -p src \
-	&& tar -xvf httpd.tar.bz2 -C src --strip-components=1 \
+	&& tar -xf httpd.tar.bz2 -C src --strip-components=1 \
 	&& rm httpd.tar.bz2 \
 	&& cd src \
 	\
@@ -77,8 +87,11 @@ RUN set -x \
 			| xargs -r apk info --installed \
 			| sort -u \
 	)" \
+	# `apk update` instead of --no-cache since `apk del` gets confused with `@edge` packages if there is no cache
+	&& apk update \
 	&& apk add --virtual .httpd-rundeps $runDeps \
-	&& apk del .build-deps
+	&& apk del .build-deps \
+	&& rm -rf /var/cache/apk/*
 
 COPY httpd-foreground /usr/local/bin/
 

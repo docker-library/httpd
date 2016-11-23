@@ -9,6 +9,7 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/}" )
 
+nghttp2VersionDebian="$(docker run -i --rm debian:stretch-slim bash -c 'apt-get update -qq && apt-cache show "$@"' -- "libnghttp2-dev" |tac|tac| awk -F ': ' '$1 == "Version" { print $2; exit }')"
 
 travisEnv=
 for version in "${versions[@]}"; do
@@ -19,6 +20,7 @@ for version in "${versions[@]}"; do
 		sed -ri \
 			-e 's/^(ENV HTTPD_VERSION) .*/\1 '"$fullVersion"'/' \
 			-e 's/^(ENV HTTPD_SHA1) .*/\1 '"$sha1"'/' \
+			-e 's/^(ENV NGHTTP2_VERSION) .*/\1 '"$nghttp2VersionDebian"'/' \
 			"$version/Dockerfile" "$version"/*/Dockerfile
 	)
 
