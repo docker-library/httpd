@@ -30,6 +30,7 @@ ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename
 # not all the mirrors actually carry the .asc files :'(
 ENV HTTPD_ASC_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2.asc
 
+# see https://httpd.apache.org/docs/2.2/install.html#requirements
 RUN set -x \
 	&& buildDeps=' \
 		bzip2 \
@@ -63,7 +64,7 @@ RUN set -x \
 # https://httpd.apache.org/docs/2.2/programs/configure.html
 # Caveat: --enable-mods-shared=all does not actually build all modules. To build all modules then, one might use:
 		--enable-mods-shared='all ssl ldap cache proxy authn_alias mem_cache file_cache authnz_ldap charset_lite dav_lock disk_cache' \
-	&& make -j"$(nproc)" \
+	&& make -j "$(nproc)" \
 	&& make install \
 	\
 	&& cd .. \

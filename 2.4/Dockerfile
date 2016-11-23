@@ -62,7 +62,7 @@ RUN set -x \
 	&& ./configure \
 		--prefix="$HTTPD_PREFIX" \
 		--enable-mods-shared=reallyall \
-	&& make -j"$(nproc)" \
+	&& make -j "$(nproc)" \
 	&& make install \
 	\
 	&& cd .. \
