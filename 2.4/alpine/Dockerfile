@@ -15,8 +15,8 @@ RUN mkdir -p "$HTTPD_PREFIX" \
 	&& chown www-data:www-data "$HTTPD_PREFIX"
 WORKDIR $HTTPD_PREFIX
 
-ENV HTTPD_VERSION 2.4.23
-ENV HTTPD_SHA1 5101be34ac4a509b245adb70a56690a84fcc4e7f
+ENV HTTPD_VERSION 2.4.25
+ENV HTTPD_SHA1 bd6d138c31c109297da2346c6e7b93b9283993d2
 
 # https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
 ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename=httpd/httpd-$HTTPD_VERSION.tar.bz2
