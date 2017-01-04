@@ -1,4 +1,8 @@
-FROM alpine:3.5
+# this cannot upgrade to Alpine 3.5 due to https://github.com/libressl-portable/portable/issues/147
+# given that 2.2.x is a "legacy branch", and is in security-fixes-only mode upstream, this should be reasonably fine
+#   "Minimal maintenance patches of 2.2.x are expected throughout this period, and users are strongly encouraged to promptly complete their transitions to the the 2.4.x flavour of httpd to benefit from a much larger assortment of minor security and bug fixes as well as new features."
+# https://httpd.apache.org/
+FROM alpine:3.4
 
 # ensure www-data user exists
 RUN set -x \
