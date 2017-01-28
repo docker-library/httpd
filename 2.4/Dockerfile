@@ -11,7 +11,7 @@ WORKDIR $HTTPD_PREFIX
 
 # library for mod_http2
 ENV NGHTTP2_VERSION 1.17.0-1
-ENV OPENSSL_VERSION 1.0.2j-1~bpo8+1
+ENV OPENSSL_VERSION 1.0.2k-1~bpo8+1
 RUN { \
 		echo 'deb http://deb.debian.org/debian stretch main'; \
 	} > /etc/apt/sources.list.d/stretch.list \
