@@ -35,6 +35,7 @@ RUN set -x \
 	&& buildDeps=' \
 		bzip2 \
 		ca-certificates \
+		dpkg-dev \
 		gcc \
 		libpcre++-dev \
 		libssl-dev \
@@ -55,11 +56,13 @@ RUN set -x \
 	&& rm -r "$GNUPGHOME" httpd.tar.bz2.asc \
 	\
 	&& mkdir -p src \
-	&& tar -xvf httpd.tar.bz2 -C src --strip-components=1 \
+	&& tar -xf httpd.tar.bz2 -C src --strip-components=1 \
 	&& rm httpd.tar.bz2 \
 	&& cd src \
 	\
+	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
 	&& ./configure \
+		--build="$gnuArch" \
 		--prefix="$HTTPD_PREFIX" \
 # https://httpd.apache.org/docs/2.2/programs/configure.html
 # Caveat: --enable-mods-shared=all does not actually build all modules. To build all modules then, one might use:

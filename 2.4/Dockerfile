@@ -59,9 +59,10 @@ RUN set -x \
 	&& buildDeps=" \
 		bzip2 \
 		ca-certificates \
+		dpkg-dev \
 		gcc \
-		libnghttp2-dev=$NGHTTP2_VERSION \
 		liblua5.2-dev \
+		libnghttp2-dev=$NGHTTP2_VERSION \
 		libpcre++-dev \
 		libssl-dev=$OPENSSL_VERSION \
 		libxml2-dev \
@@ -87,7 +88,9 @@ RUN set -x \
 	&& rm httpd.tar.bz2 \
 	&& cd src \
 	\
+	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
 	&& ./configure \
+		--build="$gnuArch" \
 		--prefix="$HTTPD_PREFIX" \
 		--enable-mods-shared=reallyall \
 	&& make -j "$(nproc)" \
