@@ -33,6 +33,8 @@ RUN set -x \
 	&& apk add --no-cache --virtual .build-deps \
 		$runDeps \
 		ca-certificates \
+		coreutils \
+		dpkg-dev dpkg \
 		gcc \
 		gnupg \
 		libc-dev \
@@ -65,10 +67,12 @@ RUN set -x \
 	&& rm httpd.tar.bz2 \
 	&& cd src \
 	\
+	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
 	&& ./configure \
+		--build="$gnuArch" \
 		--prefix="$HTTPD_PREFIX" \
 		--enable-mods-shared=reallyall \
-	&& make -j "$(getconf _NPROCESSORS_ONLN)" \
+	&& make -j "$(nproc)" \
 	&& make install \
 	\
 	&& cd .. \
