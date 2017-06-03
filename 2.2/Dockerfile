@@ -53,7 +53,7 @@ RUN set -x \
 	&& export GNUPGHOME="$(mktemp -d)" \
 	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B1B96F45DFBDCCF974019235193F180AB55D9977 \
 	&& gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2 \
-	&& rm -r "$GNUPGHOME" httpd.tar.bz2.asc \
+	&& rm -rf "$GNUPGHOME" httpd.tar.bz2.asc \
 	\
 	&& mkdir -p src \
 	&& tar -xf httpd.tar.bz2 -C src --strip-components=1 \
