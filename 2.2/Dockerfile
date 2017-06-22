@@ -3,10 +3,18 @@ FROM debian:jessie
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 #RUN groupadd -r www-data && useradd -r --create-home -g www-data www-data
 
-ENV HTTPD_PREFIX /usr/local/apache2
-ENV PATH $HTTPD_PREFIX/bin:$PATH
+ENV HTTPD_PREFIX="/usr/local/apache2" \
+	PATH="$HTTPD_PREFIX/bin:$PATH" \
+	HTTPD_VERSION="2.2.32" \
+	HTTPD_SHA1="36dc7f2ac97627192dcff0a121408b897f91b121" \
+ # https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
+	HTTPD_BZ2_URL="https://www.apache.org/dyn/closer.cgi?action=download&filename=httpd/httpd-$HTTPD_VERSION.tar.bz2" \
+ # not all the mirrors actually carry the .asc files :'(
+	HTTPD_ASC_URL="https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2.asc"
+
 RUN mkdir -p "$HTTPD_PREFIX" \
 	&& chown www-data:www-data "$HTTPD_PREFIX"
+
 WORKDIR $HTTPD_PREFIX
 
 # install httpd runtime dependencies
@@ -20,18 +28,9 @@ RUN apt-get update \
 		libaprutil1-dev \
 		libpcre++0 \
 		libssl1.0.0 \
-	&& rm -r /var/lib/apt/lists/*
-
-ENV HTTPD_VERSION 2.2.32
-ENV HTTPD_SHA1 36dc7f2ac97627192dcff0a121408b897f91b121
-
-# https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
-ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename=httpd/httpd-$HTTPD_VERSION.tar.bz2
-# not all the mirrors actually carry the .asc files :'(
-ENV HTTPD_ASC_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2.asc
-
-# see https://httpd.apache.org/docs/2.2/install.html#requirements
-RUN set -x \
+	&& rm -r /var/lib/apt/lists/* \
+ # see https://httpd.apache.org/docs/2.2/install.html#requirements
+	&& set -x \
 	&& buildDeps=' \
 		bzip2 \
 		ca-certificates \
