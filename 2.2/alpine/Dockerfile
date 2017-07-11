@@ -27,6 +27,10 @@ ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename
 # not all the mirrors actually carry the .asc files :'(
 ENV HTTPD_ASC_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2.asc
 
+# if the version is outdated, we have to pull from the archive :/
+ENV HTTPD_BZ2_FALLBACK_URL https://archive.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
+ENV HTTPD_ASC_FALLBACK_URL https://archive.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2.asc
+
 # see https://httpd.apache.org/docs/2.2/install.html#requirements
 RUN set -x \
 	&& runDeps=' \
@@ -48,10 +52,16 @@ RUN set -x \
 		pcre-dev \
 		tar \
 	\
-	&& wget -O httpd.tar.bz2 "$HTTPD_BZ2_URL" \
+	&& { \
+		wget -O httpd.tar.bz2 "$HTTPD_BZ2_URL" \
+		|| wget -O httpd.tar.bz2 "$HTTPD_BZ2_FALLBACK_URL" \
+	; } \
 	&& echo "$HTTPD_SHA1 *httpd.tar.bz2" | sha1sum -c - \
 # see https://httpd.apache.org/download.cgi#verify
-	&& wget -O httpd.tar.bz2.asc "$HTTPD_ASC_URL" \
+	&& { \
+		wget -O httpd.tar.bz2.asc "$HTTPD_ASC_URL" \
+		|| wget -O httpd.tar.bz2.asc "$HTTPD_ASC_FALLBACK_URL" \
+	; } \
 	&& export GNUPGHOME="$(mktemp -d)" \
 	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B1B96F45DFBDCCF974019235193F180AB55D9977 \
 	&& gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2 \
