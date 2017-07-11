@@ -11,7 +11,7 @@ WORKDIR $HTTPD_PREFIX
 
 # library for mod_http2
 ENV NGHTTP2_VERSION 1.18.1-1
-ENV OPENSSL_VERSION 1.0.2k-1~bpo8+1
+ENV OPENSSL_VERSION 1.0.2l-1~bpo8+1
 RUN { \
 		echo 'deb http://deb.debian.org/debian stretch main'; \
 	} > /etc/apt/sources.list.d/stretch.list \
@@ -44,8 +44,8 @@ RUN apt-get update \
 		libxml2 \
 	&& rm -r /var/lib/apt/lists/*
 
-ENV HTTPD_VERSION 2.4.25
-ENV HTTPD_SHA1 bd6d138c31c109297da2346c6e7b93b9283993d2
+ENV HTTPD_VERSION 2.4.27
+ENV HTTPD_SHA1 699e4e917e8fb5fd7d0ce7e009f8256ed02ec6fc
 
 # https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
 ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename=httpd/httpd-$HTTPD_VERSION.tar.bz2
