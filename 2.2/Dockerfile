@@ -22,8 +22,8 @@ RUN apt-get update \
 		libssl1.0.0 \
 	&& rm -r /var/lib/apt/lists/*
 
-ENV HTTPD_VERSION 2.2.32
-ENV HTTPD_SHA1 36dc7f2ac97627192dcff0a121408b897f91b121
+ENV HTTPD_VERSION 2.2.34
+ENV HTTPD_SHA1 829206394e238af0b800fc78d19c74ee466ecb23
 
 # https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
 ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename=httpd/httpd-$HTTPD_VERSION.tar.bz2
