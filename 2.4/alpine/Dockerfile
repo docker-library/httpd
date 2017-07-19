@@ -36,6 +36,7 @@ RUN set -x \
 	' \
 	&& apk add --no-cache --virtual .build-deps \
 		$runDeps \
+		apr-util-ldap \
 		ca-certificates \
 		coreutils \
 		dpkg-dev dpkg \
