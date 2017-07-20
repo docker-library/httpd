@@ -32,11 +32,11 @@ RUN set -x \
 	&& runDeps=' \
 		apr-dev \
 		apr-util-dev \
+		apr-util-ldap \
 		perl \
 	' \
 	&& apk add --no-cache --virtual .build-deps \
 		$runDeps \
-		apr-util-ldap \
 		ca-certificates \
 		coreutils \
 		dpkg-dev dpkg \
