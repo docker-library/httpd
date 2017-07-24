@@ -78,6 +78,12 @@ RUN set -x \
 	&& rm httpd.tar.bz2 \
 	&& cd src \
 	\
+# https://bz.apache.org/bugzilla/show_bug.cgi?id=61184
+# https://github.com/docker-library/httpd/pull/68
+	&& wget -O libressl.patch 'https://git.alpinelinux.org/cgit/aports/plain/main/apache2/libressl.patch?id=d7292029f25a131a0f15ebc3bc2300e75f4c131a' \
+	&& patch -p1 < libressl.patch \
+	&& rm libressl.patch \
+	\
 	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
 	&& ./configure \
 		--build="$gnuArch" \
