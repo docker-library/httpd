@@ -103,6 +103,7 @@ RUN set -x \
 		--build="$gnuArch" \
 		--prefix="$HTTPD_PREFIX" \
 		--enable-mods-shared=reallyall \
+		--enable-http2 \
 	&& make -j "$(nproc)" \
 	&& make install \
 	\
