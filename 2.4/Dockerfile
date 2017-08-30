@@ -116,6 +116,8 @@ RUN set -x \
 	\
 	&& apt-get purge -y --auto-remove $buildDeps
 
+ENV LANG C.UTF-8
+
 COPY httpd-foreground /usr/local/bin/
 
 EXPOSE 80
