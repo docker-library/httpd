@@ -1,0 +1,6 @@
+# Patches to download and apply to current version source tree
+# Blank lines, lines containing only whitespace and comments will be ignored.
+# Format: filename sha256sum url
+#
+PR61382-Fix.patch 12c0926dad2c5421e9f7eb7b9dc1b5b41a8ceeb3a72d90a58bfca23aae2b132d https://www.apache.org/dist/httpd/patches/apply_to_2.4.27/PR61382-Fix.patch
+CVE-2017-9798-patch-2.4.patch eb2309b15eaf35deaa87f815fa5fb88e46b259991edd960e64000a98a7fb2f25 https://www.apache.org/dist/httpd/patches/apply_to_2.4.27/CVE-2017-9798-patch-2.4.patch

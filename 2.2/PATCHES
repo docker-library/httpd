@@ -1,0 +1,5 @@
+# Patches to download and apply to current version source tree
+# Blank lines, lines containing only whitespace and comments will be ignored.
+# Format: filename sha256sum url
+#
+CVE-2017-9798-patch-2.2.patch 42c610f8a8f8d4d08664db6d9857120c2c252c9b388d56f238718854e6013e46 https://www.apache.org/dist/httpd/patches/apply_to_2.2.34/CVE-2017-9798-patch-2.2.patch
