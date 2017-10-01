@@ -31,6 +31,9 @@ ENV HTTPD_ASC_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 ENV HTTPD_BZ2_FALLBACK_URL https://archive.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 ENV HTTPD_ASC_FALLBACK_URL https://archive.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2.asc
 
+# Potential patch tree
+COPY PATCHES/ $HTTPD_PREFIX/PATCHES/
+
 # see https://httpd.apache.org/docs/2.2/install.html#requirements
 RUN set -x \
 	&& runDeps=' \
@@ -73,6 +76,12 @@ RUN set -x \
 	&& rm httpd.tar.bz2 \
 	&& cd src \
 	\
+	&& if [ -d $HTTPD_PREFIX/PATCHES/$HTTPD_VERSION ]; then \
+	  for PATCH in `ls -tr $HTTPD_PREFIX/PATCHES/$HTTPD_VERSION/`; \
+	  do patch -p0 < $HTTPD_PREFIX/PATCHES/$HTTPD_VERSION/$PATCH; \
+	  done; \
+	  fi \
+	&& rm -r $HTTPD_PREFIX/PATCHES \
 	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
 	&& ./configure \
 		--build="$gnuArch" \
