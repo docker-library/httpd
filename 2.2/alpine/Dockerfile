@@ -31,6 +31,9 @@ ENV HTTPD_ASC_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 ENV HTTPD_BZ2_FALLBACK_URL https://archive.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
 ENV HTTPD_ASC_FALLBACK_URL https://archive.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2.asc
 
+# Patches to apply
+COPY PATCHES $HTTPD_PREFIX
+
 # see https://httpd.apache.org/docs/2.2/install.html#requirements
 RUN set -x \
 	&& runDeps=' \
@@ -72,6 +75,20 @@ RUN set -x \
 	&& tar -xf httpd.tar.bz2 -C src --strip-components=1 \
 	&& rm httpd.tar.bz2 \
 	&& cd src \
+	\
+	&& { \
+	     grep -Ev '^(#|\s*$)' ${HTTPD_PREFIX}/PATCHES | while read -r PATCH; do \
+	     	   PATCH_FL=${PATCH%% *}; \
+		   PATCH_URL=${PATCH##* }; \
+		   PATCH_TMP=${PATCH% *}; \
+		   PATCH_SUM=${PATCH_TMP##* }; \
+		   wget -O ${PATCH_FL} "${PATCH_URL}" \
+		   	&& echo "${PATCH_SUM} ${PATCH_FL}" | sha256sum -c - \
+			&& patch -p0 < ${PATCH_FL} \
+			&& rm ${PATCH_FL} || break 0; \
+	     done \
+	 ; } \
+	&& rm $HTTPD_PREFIX/PATCHES \
 	\
 	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
 	&& ./configure \
