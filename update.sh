@@ -14,8 +14,8 @@ opensslVersionDebian="$(docker run -i --rm debian:jessie-backports bash -c 'apt-
 
 travisEnv=
 for version in "${versions[@]}"; do
-	fullVersion="$(curl -sSL --compressed "https://www.apache.org/dist/httpd/" | grep -E '<a href="httpd-'"$version"'[^"-]+.tar.bz2"' | sed -r 's!.*<a href="httpd-([^"-]+).tar.bz2".*!\1!' | sort -V | tail -1)"
-	sha1="$(curl -fsSL "https://www.apache.org/dist/httpd/httpd-$fullVersion.tar.bz2.sha1" | cut -d' ' -f1)"
+	fullVersion="$(curl -sSL --compressed "https://www-us.apache.org/dist/httpd/" | grep -E '<a href="httpd-'"$version"'[^"-]+.tar.bz2"' | sed -r 's!.*<a href="httpd-([^"-]+).tar.bz2".*!\1!' | sort -V | tail -1)"
+	sha1="$(curl -fsSL "https://www-us.apache.org/dist/httpd/httpd-$fullVersion.tar.bz2.sha1" | cut -d' ' -f1)"
 	(
 		set -x
 		sed -ri \
