@@ -44,8 +44,8 @@ RUN apt-get update \
 		libxml2 \
 	&& rm -r /var/lib/apt/lists/*
 
-ENV HTTPD_VERSION 2.4.27
-ENV HTTPD_SHA1 699e4e917e8fb5fd7d0ce7e009f8256ed02ec6fc
+ENV HTTPD_VERSION 2.4.28
+ENV HTTPD_SHA1 0b37522b808dcee72e1d56d656b0def530b820a2
 
 # https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
 ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename=httpd/httpd-$HTTPD_VERSION.tar.bz2

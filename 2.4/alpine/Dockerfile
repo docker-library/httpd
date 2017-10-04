@@ -15,8 +15,8 @@ RUN mkdir -p "$HTTPD_PREFIX" \
 	&& chown www-data:www-data "$HTTPD_PREFIX"
 WORKDIR $HTTPD_PREFIX
 
-ENV HTTPD_VERSION 2.4.27
-ENV HTTPD_SHA1 699e4e917e8fb5fd7d0ce7e009f8256ed02ec6fc
+ENV HTTPD_VERSION 2.4.28
+ENV HTTPD_SHA1 0b37522b808dcee72e1d56d656b0def530b820a2
 
 # https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
 ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename=httpd/httpd-$HTTPD_VERSION.tar.bz2
@@ -77,12 +77,6 @@ RUN set -x \
 	&& tar -xf httpd.tar.bz2 -C src --strip-components=1 \
 	&& rm httpd.tar.bz2 \
 	&& cd src \
-	\
-# https://bz.apache.org/bugzilla/show_bug.cgi?id=61184
-# https://github.com/docker-library/httpd/pull/68
-	&& wget -O libressl.patch 'https://git.alpinelinux.org/cgit/aports/plain/main/apache2/libressl.patch?id=d7292029f25a131a0f15ebc3bc2300e75f4c131a' \
-	&& patch -p1 < libressl.patch \
-	&& rm libressl.patch \
 	\
 	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
 	&& ./configure \
