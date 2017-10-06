@@ -70,6 +70,14 @@ RUN set -x \
 	&& rm httpd.tar.bz2 \
 	&& cd src \
 	\
+# Apply source patches
+        && { \
+             wget -O CVE-2017-9798-patch-2.2.patch "https://www-us.apache.org/dist/httpd/patches/apply_to_2.2.34/CVE-2017-9798-patch-2.2.patch" \
+               && echo "42c610f8a8f8d4d08664db6d9857120c2c252c9b388d56f238718854e6013e46 CVE-2017-9798-patch-2.2.patch" | sha256sum -c - \
+               && patch -p0 < CVE-2017-9798-patch-2.2.patch \
+               && rm CVE-2017-9798-patch-2.2.patch \
+        ; } \
+# End source patch list
 	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
 	&& ./configure \
 		--build="$gnuArch" \
