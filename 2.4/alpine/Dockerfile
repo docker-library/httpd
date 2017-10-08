@@ -56,8 +56,8 @@ RUN set -x \
 		pcre-dev \
 		tar \
 		# mod_deflate
-		zlib-dev \
-	\
+		zlib-dev 
+ RUN set -x \
 	&& { \
 		wget -O httpd.tar.bz2 "$HTTPD_BZ2_URL" \
 		|| wget -O httpd.tar.bz2 "$HTTPD_BZ2_FALLBACK_URL" \
@@ -71,8 +71,8 @@ RUN set -x \
 	&& export GNUPGHOME="$(mktemp -d)" \
 	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys A93D62ECC3C8EA12DB220EC934EA76E6791485A8 \
 	&& gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2 \
-	&& rm -rf "$GNUPGHOME" httpd.tar.bz2.asc \
-	\
+	&& rm -rf "$GNUPGHOME" httpd.tar.bz2.asc 
+RUN set -x \
 	&& mkdir -p src \
 	&& tar -xf httpd.tar.bz2 -C src --strip-components=1 \
 	&& rm httpd.tar.bz2 \
