@@ -20,26 +20,29 @@ RUN mkdir -p "$HTTPD_PREFIX" \
 WORKDIR $HTTPD_PREFIX
 
 ENV HTTPD_VERSION 2.2.34
-ENV HTTPD_SHA1 829206394e238af0b800fc78d19c74ee466ecb23
+ENV HTTPD_SHA256 e53183d5dfac5740d768b4c9bea193b1099f4b06b57e5f28d7caaf9ea7498160
 
+# https://httpd.apache.org/security/vulnerabilities_22.html
+ENV HTTPD_PATCHES="CVE-2017-9798-patch-2.2.patch 42c610f8a8f8d4d08664db6d9857120c2c252c9b388d56f238718854e6013e46"
+
+ENV APACHE_DIST_URLS \
 # https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
-ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename=httpd/httpd-$HTTPD_VERSION.tar.bz2
-# not all the mirrors actually carry the .asc files :'(
-ENV HTTPD_ASC_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2.asc
-
-# if the version is outdated, we have to pull from the archive :/
-ENV HTTPD_BZ2_FALLBACK_URL https://archive.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
-ENV HTTPD_ASC_FALLBACK_URL https://archive.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2.asc
+	https://www.apache.org/dyn/closer.cgi?action=download&filename= \
+# if the version is outdated (or we're grabbing the .asc file), we might have to pull from the dist/archive :/
+	https://www-us.apache.org/dist/ \
+	https://www.apache.org/dist/ \
+	https://archive.apache.org/dist/
 
 # see https://httpd.apache.org/docs/2.2/install.html#requirements
-RUN set -x \
-	&& runDeps=' \
+RUN set -eux; \
+	\
+	runDeps=' \
 		apr-dev \
 		apr-util-dev \
 		apr-util-ldap \
 		perl \
-	' \
-	&& apk add --no-cache --virtual .build-deps \
+	'; \
+	apk add --no-cache --virtual .build-deps \
 		$runDeps \
 		ca-certificates \
 		coreutils \
@@ -52,61 +55,78 @@ RUN set -x \
 		openssl-dev \
 		pcre-dev \
 		tar \
+# install GNU wget (Busybox wget in Alpine 3.4 gives us "wget: error getting response: Connection reset by peer" for some reason)
+		wget \
+	; \
 	\
-	&& { \
-		wget -O httpd.tar.bz2 "$HTTPD_BZ2_URL" \
-		|| wget -O httpd.tar.bz2 "$HTTPD_BZ2_FALLBACK_URL" \
-	; } \
-	&& echo "$HTTPD_SHA1 *httpd.tar.bz2" | sha1sum -c - \
+	ddist() { \
+		local f="$1"; shift; \
+		local distFile="$1"; shift; \
+		local success=; \
+		local distUrl=; \
+		for distUrl in $APACHE_DIST_URLS; do \
+			if wget -O "$f" "$distUrl$distFile"; then \
+				success=1; \
+				break; \
+			fi; \
+		done; \
+		[ -n "$success" ]; \
+	}; \
+	\
+	ddist 'httpd.tar.bz2' "httpd/httpd-$HTTPD_VERSION.tar.bz2"; \
+	echo "$HTTPD_SHA256 *httpd.tar.bz2" | sha256sum -c -; \
+	\
 # see https://httpd.apache.org/download.cgi#verify
-	&& { \
-		wget -O httpd.tar.bz2.asc "$HTTPD_ASC_URL" \
-		|| wget -O httpd.tar.bz2.asc "$HTTPD_ASC_FALLBACK_URL" \
-	; } \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B1B96F45DFBDCCF974019235193F180AB55D9977 \
-	&& gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2 \
-	&& rm -rf "$GNUPGHOME" httpd.tar.bz2.asc \
+	ddist 'httpd.tar.bz2.asc' "httpd/httpd-$HTTPD_VERSION.tar.bz2.asc"; \
+	export GNUPGHOME="$(mktemp -d)"; \
+	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B1B96F45DFBDCCF974019235193F180AB55D9977; \
+	gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2; \
+	rm -rf "$GNUPGHOME" httpd.tar.bz2.asc; \
 	\
-	&& mkdir -p src \
-	&& tar -xf httpd.tar.bz2 -C src --strip-components=1 \
-	&& rm httpd.tar.bz2 \
-	&& cd src \
+	mkdir -p src; \
+	tar -xf httpd.tar.bz2 -C src --strip-components=1; \
+	rm httpd.tar.bz2; \
+	cd src; \
 	\
-# Apply source patches
-        && { \
-             wget -O CVE-2017-9798-patch-2.2.patch "https://www-us.apache.org/dist/httpd/patches/apply_to_2.2.34/CVE-2017-9798-patch-2.2.patch" \
-               && echo "42c610f8a8f8d4d08664db6d9857120c2c252c9b388d56f238718854e6013e46 CVE-2017-9798-patch-2.2.patch" | sha256sum -c - \
-               && patch -p0 < CVE-2017-9798-patch-2.2.patch \
-               && rm CVE-2017-9798-patch-2.2.patch \
-        ; } \
-# End source patch list
-	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
-	&& ./configure \
+	patches() { \
+		while [ "$#" -gt 0 ]; do \
+			local patchFile="$1"; shift; \
+			local patchSha256="$1"; shift; \
+			ddist "$patchFile" "httpd/patches/apply_to_$HTTPD_VERSION/$patchFile"; \
+			echo "$patchSha256 *$patchFile" | sha256sum -c -; \
+			patch -p0 < "$patchFile"; \
+			rm -f "$patchFile"; \
+		done; \
+	}; \
+	patches $HTTPD_PATCHES; \
+	\
+	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+	./configure \
 		--build="$gnuArch" \
 		--prefix="$HTTPD_PREFIX" \
 # https://httpd.apache.org/docs/2.2/programs/configure.html
 # Caveat: --enable-mods-shared=all does not actually build all modules. To build all modules then, one might use:
 		--enable-mods-shared='all ssl ldap cache proxy authn_alias mem_cache file_cache authnz_ldap charset_lite dav_lock disk_cache' \
-	&& make -j "$(nproc)" \
-	&& make install \
+	; \
+	make -j "$(nproc)"; \
+	make install; \
 	\
-	&& cd .. \
-	&& rm -r src man manual \
+	cd ..; \
+	rm -r src man manual; \
 	\
-	&& sed -ri \
+	sed -ri \
 		-e 's!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g' \
 		-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
-		"$HTTPD_PREFIX/conf/httpd.conf" \
+		"$HTTPD_PREFIX/conf/httpd.conf"; \
 	\
-	&& runDeps="$runDeps $( \
+	runDeps="$runDeps $( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
 			| tr ',' '\n' \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-	)" \
-	&& apk add --virtual .httpd-rundeps $runDeps \
-	&& apk del .build-deps
+	)"; \
+	apk add --virtual .httpd-rundeps $runDeps; \
+	apk del .build-deps
 
 COPY httpd-foreground /usr/local/bin/
 

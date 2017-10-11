@@ -45,22 +45,25 @@ RUN apt-get update \
 	&& rm -r /var/lib/apt/lists/*
 
 ENV HTTPD_VERSION 2.4.28
-ENV HTTPD_SHA1 0b37522b808dcee72e1d56d656b0def530b820a2
+ENV HTTPD_SHA256 c1197a3a62a4ab5c584ab89b249af38cf28b4adee9c0106b62999fd29f920666
 
+# https://httpd.apache.org/security/vulnerabilities_24.html
+ENV HTTPD_PATCHES=""
+
+ENV APACHE_DIST_URLS \
 # https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
-ENV HTTPD_BZ2_URL https://www.apache.org/dyn/closer.cgi?action=download&filename=httpd/httpd-$HTTPD_VERSION.tar.bz2
-# not all the mirrors actually carry the .asc files :'(
-ENV HTTPD_ASC_URL https://www.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2.asc
-
-# if the version is outdated, we have to pull from the archive :/
-ENV HTTPD_BZ2_FALLBACK_URL https://archive.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2
-ENV HTTPD_ASC_FALLBACK_URL https://archive.apache.org/dist/httpd/httpd-$HTTPD_VERSION.tar.bz2.asc
+	https://www.apache.org/dyn/closer.cgi?action=download&filename= \
+# if the version is outdated (or we're grabbing the .asc file), we might have to pull from the dist/archive :/
+	https://www-us.apache.org/dist/ \
+	https://www.apache.org/dist/ \
+	https://archive.apache.org/dist/
 
 # see https://httpd.apache.org/docs/2.4/install.html#requirements
-RUN set -x \
+RUN set -eux; \
+	\
 	# mod_http2 mod_lua mod_proxy_html mod_xml2enc
 	# https://anonscm.debian.org/cgit/pkg-apache/apache2.git/tree/debian/control?id=adb6f181257af28ee67af15fc49d2699a0080d4c
-	&& buildDeps=" \
+	buildDeps=" \
 		bzip2 \
 		ca-certificates \
 		dpkg-dev \
@@ -73,50 +76,70 @@ RUN set -x \
 		zlib1g-dev \
 		make \
 		wget \
-	" \
-	&& apt-get update \
-	&& apt-get install -y --no-install-recommends -V $buildDeps \
-	&& rm -r /var/lib/apt/lists/* \
+	"; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends -V $buildDeps; \
+	rm -r /var/lib/apt/lists/*; \
 	\
-	&& { \
-		wget -O httpd.tar.bz2 "$HTTPD_BZ2_URL" \
-		|| wget -O httpd.tar.bz2 "$HTTPD_BZ2_FALLBACK_URL" \
-	; } \
-	&& echo "$HTTPD_SHA1 *httpd.tar.bz2" | sha1sum -c - \
+	ddist() { \
+		local f="$1"; shift; \
+		local distFile="$1"; shift; \
+		local success=; \
+		local distUrl=; \
+		for distUrl in $APACHE_DIST_URLS; do \
+			if wget -O "$f" "$distUrl$distFile"; then \
+				success=1; \
+				break; \
+			fi; \
+		done; \
+		[ -n "$success" ]; \
+	}; \
+	\
+	ddist 'httpd.tar.bz2' "httpd/httpd-$HTTPD_VERSION.tar.bz2"; \
+	echo "$HTTPD_SHA256 *httpd.tar.bz2" | sha256sum -c -; \
+	\
 # see https://httpd.apache.org/download.cgi#verify
-	&& { \
-		wget -O httpd.tar.bz2.asc "$HTTPD_ASC_URL" \
-		|| wget -O httpd.tar.bz2.asc "$HTTPD_ASC_FALLBACK_URL" \
-	; } \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys A93D62ECC3C8EA12DB220EC934EA76E6791485A8 \
-	&& gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2 \
-	&& rm -rf "$GNUPGHOME" httpd.tar.bz2.asc \
+	ddist 'httpd.tar.bz2.asc' "httpd/httpd-$HTTPD_VERSION.tar.bz2.asc"; \
+	export GNUPGHOME="$(mktemp -d)"; \
+	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys A93D62ECC3C8EA12DB220EC934EA76E6791485A8; \
+	gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2; \
+	rm -rf "$GNUPGHOME" httpd.tar.bz2.asc; \
 	\
-	&& mkdir -p src \
-	&& tar -xf httpd.tar.bz2 -C src --strip-components=1 \
-	&& rm httpd.tar.bz2 \
-	&& cd src \
+	mkdir -p src; \
+	tar -xf httpd.tar.bz2 -C src --strip-components=1; \
+	rm httpd.tar.bz2; \
+	cd src; \
 	\
-# Apply source patches
-# End source patch list
-	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
-	&& ./configure \
+	patches() { \
+		while [ "$#" -gt 0 ]; do \
+			local patchFile="$1"; shift; \
+			local patchSha256="$1"; shift; \
+			ddist "$patchFile" "httpd/patches/apply_to_$HTTPD_VERSION/$patchFile"; \
+			echo "$patchSha256 *$patchFile" | sha256sum -c -; \
+			patch -p0 < "$patchFile"; \
+			rm -f "$patchFile"; \
+		done; \
+	}; \
+	patches $HTTPD_PATCHES; \
+	\
+	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+	./configure \
 		--build="$gnuArch" \
 		--prefix="$HTTPD_PREFIX" \
 		--enable-mods-shared=reallyall \
-	&& make -j "$(nproc)" \
-	&& make install \
+	; \
+	make -j "$(nproc)"; \
+	make install; \
 	\
-	&& cd .. \
-	&& rm -r src man manual \
+	cd ..; \
+	rm -r src man manual; \
 	\
-	&& sed -ri \
+	sed -ri \
 		-e 's!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g' \
 		-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
-		"$HTTPD_PREFIX/conf/httpd.conf" \
+		"$HTTPD_PREFIX/conf/httpd.conf"; \
 	\
-	&& apt-get purge -y --auto-remove $buildDeps
+	apt-get purge -y --auto-remove $buildDeps
 
 COPY httpd-foreground /usr/local/bin/
 
