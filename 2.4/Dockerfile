@@ -127,6 +127,7 @@ RUN set -eux; \
 		--build="$gnuArch" \
 		--prefix="$HTTPD_PREFIX" \
 		--enable-mods-shared=reallyall \
+		--enable-mpms-shared=all \
 	; \
 	make -j "$(nproc)"; \
 	make install; \
