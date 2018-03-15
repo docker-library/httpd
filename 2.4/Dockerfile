@@ -44,8 +44,8 @@ RUN apt-get update \
 		libxml2 \
 	&& rm -r /var/lib/apt/lists/*
 
-ENV HTTPD_VERSION 2.4.29
-ENV HTTPD_SHA256 777753a5a25568a2a27428b2214980564bc1c38c1abf9ccc7630b639991f7f00
+ENV HTTPD_VERSION 2.4.32
+ENV HTTPD_SHA256 6353d15c15dcf8533962dfcc8c9ef978a9227e58832484d7366e73758e62b929
 
 # https://httpd.apache.org/security/vulnerabilities_24.html
 ENV HTTPD_PATCHES=""
