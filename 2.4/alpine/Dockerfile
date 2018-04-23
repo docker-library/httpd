@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM alpine:3.7
 
 # ensure www-data user exists
 RUN set -x \
