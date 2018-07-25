@@ -128,6 +128,9 @@ RUN set -eux; \
 		-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
 		"$HTTPD_PREFIX/conf/httpd.conf"; \
 	\
+	mkdir -p $HTTPD_PREFIX/conf/optional; \
+	echo 'IncludeOptional conf/optional/*.conf' >> "$HTTPD_PREFIX/conf/httpd.conf"; \
+	\
 	runDeps="$runDeps $( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
 			| tr ',' '\n' \
