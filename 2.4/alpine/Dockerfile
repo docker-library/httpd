@@ -91,6 +91,7 @@ RUN set -eux; \
 		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
 	done; \
 	gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2; \
+	command -v gpgconf && gpgconf --kill all || :; \
 	rm -rf "$GNUPGHOME" httpd.tar.bz2.asc; \
 	\
 	mkdir -p src; \
