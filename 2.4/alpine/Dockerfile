@@ -139,6 +139,7 @@ RUN set -eux; \
 	apk del .build-deps
 
 COPY httpd-foreground /usr/local/bin/
+COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 
 EXPOSE 8001
 CMD ["httpd-foreground"]
