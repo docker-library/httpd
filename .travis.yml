@@ -19,8 +19,8 @@ script:
     (
       set -Eeuo pipefail
       set -x
-      docker build -t artsdatabanken:httpd .
-      ~/official-images/test/run.sh artsdatabanken:httpd
+      docker build -t artsdatabanken/httpd:latest .
+      ~/official-images/test/run.sh artsdatabanken/httpd:latest
     )
 
 after_script:
@@ -29,7 +29,7 @@ after_script:
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-    docker push artsdatabanken:httpd;
+    docker push artsdatabanken/httpd:latest;
     fi
 
 # vim:set et ts=2 sw=2:
