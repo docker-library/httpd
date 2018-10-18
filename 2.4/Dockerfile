@@ -1,4 +1,4 @@
-FROM debian:jessie-backports
+FROM debian:stretch-backports
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 #RUN groupadd -r www-data && useradd -r --create-home -g www-data www-data
@@ -11,22 +11,7 @@ WORKDIR $HTTPD_PREFIX
 
 # library for mod_http2
 ENV NGHTTP2_VERSION 1.18.1-1
-ENV OPENSSL_VERSION 1.0.2l-1~bpo8+1
-RUN { \
-		echo 'deb http://deb.debian.org/debian stretch main'; \
-	} > /etc/apt/sources.list.d/stretch.list \
-	&& { \
-# add a negative "Pin-Priority" so that we never ever get packages from stretch unless we explicitly request them
-		echo 'Package: *'; \
-		echo 'Pin: release n=stretch'; \
-		echo 'Pin-Priority: -10'; \
-		echo; \
-# except nghttp2, which is the reason we're here
-		echo 'Package: libnghttp2*'; \
-		echo "Pin: version $NGHTTP2_VERSION"; \
-		echo 'Pin-Priority: 990'; \
-		echo; \
-	} > /etc/apt/preferences.d/unstable-nghttp2
+ENV OPENSSL_VERSION 1.1.0f-3+deb9u2
 
 # install httpd runtime dependencies
 # https://httpd.apache.org/docs/2.4/install.html#requirements
@@ -39,8 +24,8 @@ RUN apt-get update \
 		libaprutil1-dev \
 		liblua5.2-0 \
 		libnghttp2-14=$NGHTTP2_VERSION \
-		libpcre++0 \
-		libssl1.0.0=$OPENSSL_VERSION \
+		libpcre++0v5 \
+		libssl1.1=$OPENSSL_VERSION \
 		libxml2 \
 	&& rm -r /var/lib/apt/lists/*
 
@@ -66,8 +51,10 @@ RUN set -eux; \
 	buildDeps=" \
 		bzip2 \
 		ca-certificates \
+		dirmngr \
 		dpkg-dev \
 		gcc \
+		gnupg \
 		liblua5.2-dev \
 		libnghttp2-dev=$NGHTTP2_VERSION \
 		libpcre++-dev \

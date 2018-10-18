@@ -10,7 +10,7 @@ fi
 versions=( "${versions[@]%/}" )
 
 nghttp2VersionDebian="$(docker run -i --rm debian:stretch-slim bash -c 'apt-get update -qq && apt-cache show "$@"' -- 'libnghttp2-dev' |tac|tac| awk -F ': ' '$1 == "Version" { print $2; exit }')"
-opensslVersionDebian="$(docker run -i --rm debian:jessie-backports bash -c 'apt-get update -qq && apt-cache show "$@"' -- 'openssl' |tac|tac| awk -F ': ' '$1 == "Version" { print $2; exit }')"
+opensslVersionDebian="$(docker run -i --rm debian:stretch-backports bash -c 'apt-get update -qq && apt-cache show "$@"' -- 'openssl' |tac|tac| awk -F ': ' '$1 == "Version" { print $2; exit }')"
 
 travisEnv=
 for version in "${versions[@]}"; do
