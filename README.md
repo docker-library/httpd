@@ -2,7 +2,7 @@
 
 ## Maintained by: [the Docker Community](https://github.com/docker-library/httpd)
 
-This is the Git repo of the [Docker "Official Image"](https://docs.docker.com/docker-hub/official_repos/) for [httpd](https://hub.docker.com/_/httpd/) (not to be confused with any official httpd image provided by httpd upstream). See [the Docker Hub page](https://hub.docker.com/_/httpd/) for the full readme on how to use this Docker image and for information regarding contributing and issues.
+This is forked from the original repository. 
 
 The [full description from Docker Hub](https://hub.docker.com/_/httpd/) is generated over in [docker-library/docs](https://github.com/docker-library/docs), specifically in [docker-library/docs/httpd](https://github.com/docker-library/docs/tree/master/httpd).
 
