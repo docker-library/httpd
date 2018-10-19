@@ -1,4 +1,4 @@
-FROM debian:jessie-backports
+FROM debian:stretch-slim
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 #RUN groupadd -r www-data && useradd -r --create-home -g www-data www-data
@@ -9,40 +9,16 @@ RUN mkdir -p "$HTTPD_PREFIX" \
 	&& chown www-data:www-data "$HTTPD_PREFIX"
 WORKDIR $HTTPD_PREFIX
 
-# library for mod_http2
-ENV NGHTTP2_VERSION 1.18.1-1
-ENV OPENSSL_VERSION 1.0.2l-1~bpo8+1
-RUN { \
-		echo 'deb http://deb.debian.org/debian stretch main'; \
-	} > /etc/apt/sources.list.d/stretch.list \
-	&& { \
-# add a negative "Pin-Priority" so that we never ever get packages from stretch unless we explicitly request them
-		echo 'Package: *'; \
-		echo 'Pin: release n=stretch'; \
-		echo 'Pin-Priority: -10'; \
-		echo; \
-# except nghttp2, which is the reason we're here
-		echo 'Package: libnghttp2*'; \
-		echo "Pin: version $NGHTTP2_VERSION"; \
-		echo 'Pin-Priority: 990'; \
-		echo; \
-	} > /etc/apt/preferences.d/unstable-nghttp2
-
 # install httpd runtime dependencies
 # https://httpd.apache.org/docs/2.4/install.html#requirements
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
-		libapr1 \
-		libaprutil1 \
-		libaprutil1-ldap \
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
 		libapr1-dev \
 		libaprutil1-dev \
-		liblua5.2-0 \
-		libnghttp2-14=$NGHTTP2_VERSION \
-		libpcre++0 \
-		libssl1.0.0=$OPENSSL_VERSION \
-		libxml2 \
-	&& rm -r /var/lib/apt/lists/*
+		libaprutil1-ldap \
+	; \
+	rm -rf /var/lib/apt/lists/*
 
 ENV HTTPD_VERSION 2.4.35
 ENV HTTPD_SHA256 2607c6fdd4d12ac3f583127629291e9432b247b782396a563bec5678aae69b56
@@ -63,22 +39,24 @@ RUN set -eux; \
 	\
 	# mod_http2 mod_lua mod_proxy_html mod_xml2enc
 	# https://anonscm.debian.org/cgit/pkg-apache/apache2.git/tree/debian/control?id=adb6f181257af28ee67af15fc49d2699a0080d4c
-	buildDeps=" \
+	savedAptMark="$(apt-mark showmanual)"; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
 		bzip2 \
 		ca-certificates \
+		dirmngr \
 		dpkg-dev \
 		gcc \
+		gnupg \
 		liblua5.2-dev \
-		libnghttp2-dev=$NGHTTP2_VERSION \
-		libpcre++-dev \
-		libssl-dev=$OPENSSL_VERSION \
+		libnghttp2-dev \
+		libpcre3-dev \
+		libssl-dev \
 		libxml2-dev \
-		zlib1g-dev \
 		make \
 		wget \
-	"; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends -V $buildDeps; \
+		zlib1g-dev \
+	; \
 	rm -r /var/lib/apt/lists/*; \
 	\
 	ddist() { \
@@ -148,7 +126,21 @@ RUN set -eux; \
 		-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
 		"$HTTPD_PREFIX/conf/httpd.conf"; \
 	\
-	apt-get purge -y --auto-remove $buildDeps
+# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
+	apt-mark auto '.*' > /dev/null; \
+	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
+	find /usr/local -type f -executable -exec ldd '{}' ';' \
+		| awk '/=>/ { print $(NF-1) }' \
+		| sort -u \
+		| xargs -r dpkg-query --search \
+		| cut -d: -f1 \
+		| sort -u \
+		| xargs -r apt-mark manual \
+	; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	\
+# smoke test
+	httpd -v
 
 COPY httpd-foreground /usr/local/bin/
 

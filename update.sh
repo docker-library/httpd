@@ -9,9 +9,6 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/}" )
 
-nghttp2VersionDebian="$(docker run -i --rm debian:stretch-slim bash -c 'apt-get update -qq && apt-cache show "$@"' -- 'libnghttp2-dev' |tac|tac| awk -F ': ' '$1 == "Version" { print $2; exit }')"
-opensslVersionDebian="$(docker run -i --rm debian:jessie-backports bash -c 'apt-get update -qq && apt-cache show "$@"' -- 'openssl' |tac|tac| awk -F ': ' '$1 == "Version" { print $2; exit }')"
-
 travisEnv=
 for version in "${versions[@]}"; do
 	fullVersion="$(
@@ -46,8 +43,6 @@ for version in "${versions[@]}"; do
 	sed -ri \
 		-e 's/^(ENV HTTPD_VERSION) .*/\1 '"$fullVersion"'/' \
 		-e 's/^(ENV HTTPD_SHA256) .*/\1 '"$sha256"'/' \
-		-e 's/^(ENV NGHTTP2_VERSION) .*/\1 '"$nghttp2VersionDebian"'/' \
-		-e 's/^(ENV OPENSSL_VERSION) .*/\1 '"$opensslVersionDebian"'/' \
 		-e 's/^(ENV HTTPD_PATCHES=").*(")$/\1'"${patches[*]}"'\2/' \
 		"$version/Dockerfile" "$version"/*/Dockerfile
 
