@@ -11,19 +11,14 @@ WORKDIR $HTTPD_PREFIX
 
 # install httpd runtime dependencies
 # https://httpd.apache.org/docs/2.4/install.html#requirements
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
-		libapr1 \
-		libaprutil1 \
-		libaprutil1-ldap \
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
 		libapr1-dev \
 		libaprutil1-dev \
-		liblua5.2-0 \
-		libnghttp2-14 \
-		libpcre++0v5 \
-		libssl1.1 \
-		libxml2 \
-	&& rm -r /var/lib/apt/lists/*
+		libaprutil1-ldap \
+	; \
+	rm -rf /var/lib/apt/lists/*
 
 ENV HTTPD_VERSION 2.4.35
 ENV HTTPD_SHA256 2607c6fdd4d12ac3f583127629291e9432b247b782396a563bec5678aae69b56
@@ -55,12 +50,12 @@ RUN set -eux; \
 		gnupg \
 		liblua5.2-dev \
 		libnghttp2-dev \
-		libpcre++-dev \
+		libpcre3-dev \
 		libssl-dev \
 		libxml2-dev \
-		zlib1g-dev \
 		make \
 		wget \
+		zlib1g-dev \
 	; \
 	rm -r /var/lib/apt/lists/*; \
 	\
@@ -142,7 +137,10 @@ RUN set -eux; \
 		| sort -u \
 		| xargs -r apt-mark manual \
 	; \
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	\
+# smoke test
+	httpd -v
 
 COPY httpd-foreground /usr/local/bin/
 

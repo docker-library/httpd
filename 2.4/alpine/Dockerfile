@@ -136,7 +136,10 @@ RUN set -eux; \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
 	apk add --virtual .httpd-rundeps $runDeps; \
-	apk del .build-deps
+	apk del .build-deps; \
+	\
+# smoke test
+	httpd -v
 
 COPY httpd-foreground /usr/local/bin/
 
