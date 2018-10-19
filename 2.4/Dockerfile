@@ -1,4 +1,4 @@
-FROM debian:stretch-backports
+FROM debian:stretch-slim
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 #RUN groupadd -r www-data && useradd -r --create-home -g www-data www-data
@@ -8,10 +8,6 @@ ENV PATH $HTTPD_PREFIX/bin:$PATH
 RUN mkdir -p "$HTTPD_PREFIX" \
 	&& chown www-data:www-data "$HTTPD_PREFIX"
 WORKDIR $HTTPD_PREFIX
-
-# library for mod_http2
-ENV NGHTTP2_VERSION 1.18.1-1
-ENV OPENSSL_VERSION 1.1.0f-3+deb9u2
 
 # install httpd runtime dependencies
 # https://httpd.apache.org/docs/2.4/install.html#requirements
@@ -23,9 +19,9 @@ RUN apt-get update \
 		libapr1-dev \
 		libaprutil1-dev \
 		liblua5.2-0 \
-		libnghttp2-14=$NGHTTP2_VERSION \
+		libnghttp2-14 \
 		libpcre++0v5 \
-		libssl1.1=$OPENSSL_VERSION \
+		libssl1.1 \
 		libxml2 \
 	&& rm -r /var/lib/apt/lists/*
 
@@ -56,9 +52,9 @@ RUN set -eux; \
 		gcc \
 		gnupg \
 		liblua5.2-dev \
-		libnghttp2-dev=$NGHTTP2_VERSION \
+		libnghttp2-dev \
 		libpcre++-dev \
-		libssl-dev=$OPENSSL_VERSION \
+		libssl-dev \
 		libxml2-dev \
 		zlib1g-dev \
 		make \
