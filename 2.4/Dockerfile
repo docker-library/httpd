@@ -44,7 +44,9 @@ RUN set -eux; \
 	\
 	# mod_http2 mod_lua mod_proxy_html mod_xml2enc
 	# https://anonscm.debian.org/cgit/pkg-apache/apache2.git/tree/debian/control?id=adb6f181257af28ee67af15fc49d2699a0080d4c
-	buildDeps=" \
+	savedAptMark="$(apt-mark showmanual)"; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
 		bzip2 \
 		ca-certificates \
 		dirmngr \
@@ -59,9 +61,7 @@ RUN set -eux; \
 		zlib1g-dev \
 		make \
 		wget \
-	"; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends -V $buildDeps; \
+	; \
 	rm -r /var/lib/apt/lists/*; \
 	\
 	ddist() { \
@@ -131,7 +131,18 @@ RUN set -eux; \
 		-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
 		"$HTTPD_PREFIX/conf/httpd.conf"; \
 	\
-	apt-get purge -y --auto-remove $buildDeps
+# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
+	apt-mark auto '.*' > /dev/null; \
+	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
+	find /usr/local -type f -executable -exec ldd '{}' ';' \
+		| awk '/=>/ { print $(NF-1) }' \
+		| sort -u \
+		| xargs -r dpkg-query --search \
+		| cut -d: -f1 \
+		| sort -u \
+		| xargs -r apt-mark manual \
+	; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 
 COPY httpd-foreground /usr/local/bin/
 
