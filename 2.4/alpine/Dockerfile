@@ -140,6 +140,7 @@ RUN set -eux; \
 
 COPY httpd-foreground /usr/local/bin/
 COPY ./httpd.conf /usr/local/apache2/conf/httpd.conf
+COPY .htaccess /usr/local/apache2/htdocs/.htaccess
 
 EXPOSE 8001
 CMD ["httpd-foreground"]
