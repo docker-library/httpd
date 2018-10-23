@@ -142,5 +142,5 @@ COPY httpd-foreground /usr/local/bin/
 COPY ./httpd.conf /usr/local/apache2/conf/httpd.conf
 COPY .htaccess /usr/local/apache2/htdocs/
 
-EXPOSE 8001
+EXPOSE 3001
 CMD ["httpd-foreground"]
