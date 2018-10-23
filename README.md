@@ -7,7 +7,7 @@ This is forked from the original repository.
 The [full description from Docker Hub](https://hub.docker.com/_/httpd/) is generated over in [docker-library/docs](https://github.com/docker-library/docs), specifically in [docker-library/docs/httpd](https://github.com/docker-library/docs/tree/master/httpd).
 
 ## See a change merged here that doesn't show up on Docker Hub yet?
-
+## Fixed some issues
 Check [the "library/httpd" manifest file in the docker-library/official-images repo](https://github.com/docker-library/official-images/blob/master/library/httpd), especially [PRs with the "library/httpd" label on that repo](https://github.com/docker-library/official-images/labels/library%2Fhttpd).
 
 For more information about the official images process, see the [docker-library/official-images readme](https://github.com/docker-library/official-images/blob/master/README.md).
