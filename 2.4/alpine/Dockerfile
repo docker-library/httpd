@@ -1,13 +1,13 @@
-FROM alpine:3.7
+FROM alpine:3.8
 
 # ensure www-data user exists
 RUN set -x \
 	&& addgroup -g 82 -S www-data \
 	&& adduser -u 82 -D -S -G www-data www-data
 # 82 is the standard uid/gid for "www-data" in Alpine
-# https://git.alpinelinux.org/cgit/aports/tree/main/apache2/apache2.pre-install?h=v3.3.2
-# https://git.alpinelinux.org/cgit/aports/tree/main/lighttpd/lighttpd.pre-install?h=v3.3.2
-# https://git.alpinelinux.org/cgit/aports/tree/main/nginx-initscripts/nginx-initscripts.pre-install?h=v3.3.2
+# https://git.alpinelinux.org/cgit/aports/tree/main/apache2/apache2.pre-install?h=v3.8
+# https://git.alpinelinux.org/cgit/aports/tree/main/lighttpd/lighttpd.pre-install?h=v3.8
+# https://git.alpinelinux.org/cgit/aports/tree/main/nginx-initscripts/nginx-initscripts.pre-install?h=v3.8
 
 ENV HTTPD_PREFIX /usr/local/apache2
 ENV PATH $HTTPD_PREFIX/bin:$PATH
