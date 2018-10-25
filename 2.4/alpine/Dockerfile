@@ -1,13 +1,13 @@
-FROM alpine:3.7
+FROM alpine:3.8
 
 # ensure www-data user exists
 RUN set -x \
 	&& addgroup -g 82 -S www-data \
 	&& adduser -u 82 -D -S -G www-data www-data
 # 82 is the standard uid/gid for "www-data" in Alpine
-# http://git.alpinelinux.org/cgit/aports/tree/main/apache2/apache2.pre-install?h=v3.3.2
-# http://git.alpinelinux.org/cgit/aports/tree/main/lighttpd/lighttpd.pre-install?h=v3.3.2
-# http://git.alpinelinux.org/cgit/aports/tree/main/nginx-initscripts/nginx-initscripts.pre-install?h=v3.3.2
+# https://git.alpinelinux.org/cgit/aports/tree/main/apache2/apache2.pre-install?h=v3.8.1
+# https://git.alpinelinux.org/cgit/aports/tree/main/lighttpd/lighttpd.pre-install?h=v3.8.1
+# https://git.alpinelinux.org/cgit/aports/tree/main/nginx/nginx.pre-install?h=v3.8.1
 
 ENV HTTPD_PREFIX /usr/local/apache2
 ENV PATH $HTTPD_PREFIX/bin:$PATH
@@ -85,7 +85,7 @@ RUN set -eux; \
 	for key in \
 # gpg: key 791485A8: public key "Jim Jagielski (Release Signing Key) <jim@apache.org>" imported
 		A93D62ECC3C8EA12DB220EC934EA76E6791485A8 \
-# gpg: key 995E35221AD84DFF: public key "Daniel Ruggeri (http://home.apache.org/~druggeri/) <druggeri@apache.org>" imported
+# gpg: key 995E35221AD84DFF: public key "Daniel Ruggeri (https://home.apache.org/~druggeri/) <druggeri@apache.org>" imported
 		B9E8213AEFB861AF35A41F2C995E35221AD84DFF \
 	; do \
 		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
