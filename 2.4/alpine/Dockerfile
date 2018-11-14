@@ -88,7 +88,7 @@ RUN set -eux; \
 # gpg: key 995E35221AD84DFF: public key "Daniel Ruggeri (https://home.apache.org/~druggeri/) <druggeri@apache.org>" imported
 		B9E8213AEFB861AF35A41F2C995E35221AD84DFF \
 	; do \
-		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+		gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
 	done; \
 	gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2; \
 	command -v gpgconf && gpgconf --kill all || :; \
