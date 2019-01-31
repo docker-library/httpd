@@ -1,4 +1,4 @@
-FROM alpine:3.8
+FROM alpine:3.9
 
 # ensure www-data user exists
 RUN set -x \
@@ -46,9 +46,6 @@ RUN set -eux; \
 		gcc \
 		gnupg \
 		libc-dev \
-		# mod_session_crypto
-		libressl \
-		libressl-dev \
 		# mod_proxy_html mod_xml2enc
 		libxml2-dev \
 		# mod_lua
@@ -56,6 +53,9 @@ RUN set -eux; \
 		make \
 		# mod_http2
 		nghttp2-dev \
+		# mod_session_crypto
+		openssl \
+		openssl-dev \
 		pcre-dev \
 		tar \
 		# mod_deflate
