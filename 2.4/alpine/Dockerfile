@@ -127,7 +127,10 @@ RUN set -eux; \
 	sed -ri \
 		-e 's!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g' \
 		-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
-		"$HTTPD_PREFIX/conf/httpd.conf"; \
+		-e 's!^(\s*TransferLog)\s+\S+!\1 /proc/self/fd/1!g' \
+		"$HTTPD_PREFIX/conf/httpd.conf" \
+		"$HTTPD_PREFIX/conf/extra/httpd-ssl.conf" \
+	; \
 	\
 	runDeps="$runDeps $( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \

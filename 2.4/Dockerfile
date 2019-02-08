@@ -124,7 +124,10 @@ RUN set -eux; \
 	sed -ri \
 		-e 's!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g' \
 		-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
-		"$HTTPD_PREFIX/conf/httpd.conf"; \
+		-e 's!^(\s*TransferLog)\s+\S+!\1 /proc/self/fd/1!g' \
+		"$HTTPD_PREFIX/conf/httpd.conf" \
+		"$HTTPD_PREFIX/conf/extra/httpd-ssl.conf" \
+	; \
 	\
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
