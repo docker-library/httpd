@@ -46,6 +46,9 @@ RUN set -eux; \
 		gcc \
 		gnupg \
 		libc-dev \
+		# mod_md
+		curl-dev \
+		jansson-dev \
 		# mod_proxy_html mod_xml2enc
 		libxml2-dev \
 		# mod_lua
