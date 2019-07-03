@@ -26,14 +26,6 @@ ENV HTTPD_SHA256 b4ca9d05773aa59b54d66cd8f4744b945289f084d3be17d7981d1783a5decfa
 # https://httpd.apache.org/security/vulnerabilities_24.html
 ENV HTTPD_PATCHES=""
 
-ENV APACHE_DIST_URLS \
-# https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
-	https://www.apache.org/dyn/closer.cgi?action=download&filename= \
-# if the version is outdated (or we're grabbing the .asc file), we might have to pull from the dist/archive :/
-	https://www-us.apache.org/dist/ \
-	https://www.apache.org/dist/ \
-	https://archive.apache.org/dist/
-
 # see https://httpd.apache.org/docs/2.4/install.html#requirements
 RUN set -eux; \
 	\
@@ -69,7 +61,14 @@ RUN set -eux; \
 		local distFile="$1"; shift; \
 		local success=; \
 		local distUrl=; \
-		for distUrl in $APACHE_DIST_URLS; do \
+		for distUrl in \
+# https://issues.apache.org/jira/browse/INFRA-8753?focusedCommentId=14735394#comment-14735394
+			'https://www.apache.org/dyn/closer.cgi?action=download&filename=' \
+# if the version is outdated (or we're grabbing the .asc file), we might have to pull from the dist/archive :/
+			https://www-us.apache.org/dist/ \
+			https://www.apache.org/dist/ \
+			https://archive.apache.org/dist/ \
+		; do \
 			if wget -O "$f" "$distUrl$distFile" && [ -s "$f" ]; then \
 				success=1; \
 				break; \
@@ -87,7 +86,7 @@ RUN set -eux; \
 	for key in \
 # gpg: key 791485A8: public key "Jim Jagielski (Release Signing Key) <jim@apache.org>" imported
 		A93D62ECC3C8EA12DB220EC934EA76E6791485A8 \
-# gpg: key 995E35221AD84DFF: public key "Daniel Ruggeri (http://home.apache.org/~druggeri/) <druggeri@apache.org>" imported
+# gpg: key 995E35221AD84DFF: public key "Daniel Ruggeri (https://home.apache.org/~druggeri/) <druggeri@apache.org>" imported
 		B9E8213AEFB861AF35A41F2C995E35221AD84DFF \
 	; do \
 		gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
