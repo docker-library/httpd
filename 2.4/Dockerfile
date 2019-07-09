@@ -1,4 +1,4 @@
-FROM debian:stretch-slim
+FROM debian:buster-slim
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 #RUN groupadd -r www-data && useradd -r --create-home -g www-data www-data
@@ -29,8 +29,6 @@ ENV HTTPD_PATCHES=""
 # see https://httpd.apache.org/docs/2.4/install.html#requirements
 RUN set -eux; \
 	\
-	# libbrotli is only in backports: https://packages.debian.org/stretch-backports/libbrotli-dev
-	echo 'deb http://deb.debian.org/debian stretch-backports main' > /etc/apt/sources.list.d/stretch-backports.list; \
 	# mod_http2 mod_lua mod_proxy_html mod_xml2enc
 	# https://anonscm.debian.org/cgit/pkg-apache/apache2.git/tree/debian/control?id=adb6f181257af28ee67af15fc49d2699a0080d4c
 	savedAptMark="$(apt-mark showmanual)"; \
