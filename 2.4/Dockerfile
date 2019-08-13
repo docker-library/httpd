@@ -130,6 +130,9 @@ RUN set -eux; \
 		"$HTTPD_PREFIX/conf/httpd.conf" \
 		"$HTTPD_PREFIX/conf/extra/httpd-ssl.conf" \
 	; \
+	echo "Adding IncludeOptional to allow mounting custom configs" ; \
+	mkdir -p $HTTPD_PREFIX/conf/conf.d; \
+	echo "\nIncludeOptional $HTTPD_PREFIX/conf/conf.d/*.conf" >> $HTTPD_PREFIX/conf/httpd.conf; \
 	\
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
