@@ -146,6 +146,9 @@ RUN set -eux; \
 # smoke test
 	httpd -v
 
+# https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
+STOPSIGNAL WINCH
+
 COPY httpd-foreground /usr/local/bin/
 
 EXPOSE 80
