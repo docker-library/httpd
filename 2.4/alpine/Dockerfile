@@ -12,7 +12,7 @@ RUN set -x \
 ENV HTTPD_PREFIX /usr/local/apache2
 ENV PATH $HTTPD_PREFIX/bin:$PATH
 RUN mkdir -p "$HTTPD_PREFIX" \
-	&& chown www-data:www-data "$HTTPD_PREFIX"
+	&& chown -R www-data:www-data "$HTTPD_PREFIX"
 WORKDIR $HTTPD_PREFIX
 
 ENV HTTPD_VERSION 2.4.35
