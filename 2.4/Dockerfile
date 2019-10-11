@@ -116,6 +116,10 @@ RUN set -eux; \
 		--prefix="$HTTPD_PREFIX" \
 		--enable-mods-shared=reallyall \
 		--enable-mpms-shared=all \
+		--enable-pie \
+		CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security" \
+		CPPFLAGS="-D_FORTIFY_SOURCE=2" \
+		LDFLAGS="-Wl,--as-needed -Wl,-z,relro -Wl,-z,now" \
 	; \
 	make -j "$(nproc)"; \
 	make install; \
