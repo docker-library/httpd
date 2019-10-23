@@ -55,6 +55,8 @@ RUN set -eux; \
 		tar \
 		# mod_deflate
 		zlib-dev \
+		# mod_brotli
+		brotli-dev \
 	; \
 	\
 	ddist() { \
