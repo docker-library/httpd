@@ -111,11 +111,21 @@ RUN set -eux; \
 	patches $HTTPD_PATCHES; \
 	\
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+	CFLAGS="$(dpkg-buildflags --get CFLAGS)"; \
+	CPPFLAGS="$(dpkg-buildflags --get CPPFLAGS)"; \
+	LDFLAGS="$(dpkg-buildflags --get LDFLAGS)"; \
 	./configure \
 		--build="$gnuArch" \
 		--prefix="$HTTPD_PREFIX" \
 		--enable-mods-shared=reallyall \
 		--enable-mpms-shared=all \
+# enable the same hardening flags as Debian
+# - https://salsa.debian.org/apache-team/apache2/blob/87db7de4e59683fb03e97900f078d06ef2292748/debian/rules#L19-21
+# - https://salsa.debian.org/apache-team/apache2/blob/87db7de4e59683fb03e97900f078d06ef2292748/debian/rules#L115
+		--enable-pie \
+		CFLAGS="-pipe $CFLAGS" \
+		CPPFLAGS="$CPPFLAGS" \
+		LDFLAGS="-Wl,--as-needed $LDFLAGS" \
 	; \
 	make -j "$(nproc)"; \
 	make install; \
