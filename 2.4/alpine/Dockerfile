@@ -121,6 +121,7 @@ RUN set -eux; \
 		--prefix="$HTTPD_PREFIX" \
 		--enable-mods-shared=reallyall \
 		--enable-mpms-shared=all \
+# PIE and hardening flags are unnecessary as Alpine enables them automatically (https://alpinelinux.org/about/)
 	; \
 	make -j "$(nproc)"; \
 	make install; \
