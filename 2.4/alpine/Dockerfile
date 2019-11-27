@@ -149,7 +149,7 @@ RUN set -eux; \
 	httpd -v
 
 # https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
-STOPSIGNAL WINCH
+STOPSIGNAL SIGWINCH
 
 COPY httpd-foreground /usr/local/bin/
 
