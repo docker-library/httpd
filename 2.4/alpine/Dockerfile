@@ -26,6 +26,7 @@ RUN set -eux; \
 	\
 	runDeps=' \
 		apr-dev \
+		apr-util-dbm_db \
 		apr-util-dev \
 		apr-util-ldap \
 		perl \
