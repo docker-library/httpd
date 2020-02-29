@@ -18,7 +18,14 @@ RUN set -eux; \
 		libaprutil1-dev \
 		libaprutil1-ldap \
 	; \
-	rm -rf /var/lib/apt/lists/*
+	apt-get clean; \
+	rm -rf \
+		/var/lib/apt/lists/* \
+		/tmp/* \
+        	/var/tmp/* \
+        	/usr/share/man \
+        	/usr/share/doc \
+        	/usr/share/doc-base
 
 ENV HTTPD_VERSION 2.4.41
 ENV HTTPD_SHA256 133d48298fe5315ae9366a0ec66282fa4040efa5d566174481077ade7d18ea40
@@ -52,7 +59,14 @@ RUN set -eux; \
 		wget \
 		zlib1g-dev \
 	; \
-	rm -r /var/lib/apt/lists/*; \
+	apt-get clean; \
+	rm -rf \
+		/var/lib/apt/lists/* \
+		/tmp/* \
+        	/var/tmp/* \
+        	/usr/share/man \
+        	/usr/share/doc \
+        	/usr/share/doc-base; \
 	\
 	ddist() { \
 		local f="$1"; shift; \
