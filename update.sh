@@ -9,7 +9,6 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/}" )
 
-travisEnv=
 for version in "${versions[@]}"; do
 	fullVersion="$(
 		wget -qO- "https://www-us.apache.org/dist/httpd/" \
@@ -45,12 +44,4 @@ for version in "${versions[@]}"; do
 		-e 's/^(ENV HTTPD_SHA256) .*/\1 '"$sha256"'/' \
 		-e 's/^(ENV HTTPD_PATCHES=").*(")$/\1'"${patches[*]}"'\2/' \
 		"$version/Dockerfile" "$version"/*/Dockerfile
-
-	for variant in alpine; do
-		travisEnv='\n  - VERSION='"$version VARIANT=$variant$travisEnv"
-	done
-	travisEnv='\n  - VERSION='"$version$travisEnv"
 done
-
-travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
-echo "$travis" > .travis.yml
