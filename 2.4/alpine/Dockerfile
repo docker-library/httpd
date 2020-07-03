@@ -25,14 +25,16 @@ ENV HTTPD_PATCHES=""
 RUN set -eux; \
 	\
 	runDeps=' \
-		apr-dev \
+		apr \
+		apr-util \
 		apr-util-dbm_db \
-		apr-util-dev \
 		apr-util-ldap \
 		perl \
 	'; \
 	apk add --no-cache --virtual .build-deps \
 		$runDeps \
+		apr-dev \
+		apr-util-dev \
 		ca-certificates \
 		coreutils \
 		dpkg-dev dpkg \
