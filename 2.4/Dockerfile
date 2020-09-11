@@ -9,31 +9,32 @@ RUN mkdir -p "$HTTPD_PREFIX" \
 	&& chown www-data:www-data "$HTTPD_PREFIX"
 WORKDIR $HTTPD_PREFIX
 
-# install httpd runtime dependencies
-# https://httpd.apache.org/docs/2.4/install.html#requirements
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		libapr1-dev \
-		libaprutil1-dev \
-		libaprutil1-ldap \
-	; \
-	rm -rf /var/lib/apt/lists/*
-
 ENV HTTPD_VERSION 2.4.46
 ENV HTTPD_SHA256 740eddf6e1c641992b22359cabc66e6325868c3c5e2e3f98faf349b61ecf41ea
 
 # https://httpd.apache.org/security/vulnerabilities_24.html
 ENV HTTPD_PATCHES=""
 
-# see https://httpd.apache.org/docs/2.4/install.html#requirements
+# install httpd runtime dependencies
+# https://httpd.apache.org/docs/2.4/install.html#requirements
 RUN set -eux; \
-	\
+	apt-get update; \
+	# install apt packages needed at run-time
+	apt-get install -y --no-install-recommends \
+		libapr1 \
+		libaprutil1 \
+		libaprutil1-ldap \
+		libnghttp2-14 \
+		libssl1.1 \
+		libbrotli1 \
+	; \
 	# mod_http2 mod_lua mod_proxy_html mod_xml2enc
 	# https://anonscm.debian.org/cgit/pkg-apache/apache2.git/tree/debian/control?id=adb6f181257af28ee67af15fc49d2699a0080d4c
 	savedAptMark="$(apt-mark showmanual)"; \
-	apt-get update; \
+	# install apt packages needed to compile, these will be removed later
 	apt-get install -y --no-install-recommends \
+		libapr1-dev \
+		libaprutil1-dev \
 		bzip2 \
 		ca-certificates \
 		dirmngr \
@@ -216,6 +217,7 @@ RUN set -eux; \
 		| xargs -r apt-mark manual \
 	; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	apt-get clean; \
 	\
 # smoke test
 	httpd -v
