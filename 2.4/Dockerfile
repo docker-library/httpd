@@ -32,14 +32,14 @@ RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		libapr1-dev \
-		libaprutil1-dev \
 		bzip2 \
 		ca-certificates \
 		dirmngr \
 		dpkg-dev \
 		gcc \
 		gnupg \
+		libapr1-dev \
+		libaprutil1-dev \
 		libbrotli-dev \
 		libcurl4-openssl-dev \
 		libjansson-dev \
