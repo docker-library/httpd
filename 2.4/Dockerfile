@@ -14,8 +14,6 @@ WORKDIR $HTTPD_PREFIX
 RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		libapr1-dev \
-		libaprutil1-dev \
 		libaprutil1-ldap \
 	; \
 	rm -rf /var/lib/apt/lists/*
@@ -34,6 +32,8 @@ RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
+		libapr1-dev \
+		libaprutil1-dev \
 		bzip2 \
 		ca-certificates \
 		dirmngr \
