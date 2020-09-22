@@ -9,6 +9,8 @@ RUN set -x \
 # http://git.alpinelinux.org/cgit/aports/tree/main/lighttpd/lighttpd.pre-install?h=v3.3.2
 # http://git.alpinelinux.org/cgit/aports/tree/main/nginx-initscripts/nginx-initscripts.pre-install?h=v3.3.2
 
+RUN apt-get update && apt-get install -y cron
+
 ENV HTTPD_PREFIX /usr/local/apache2
 ENV PATH $HTTPD_PREFIX/bin:$PATH
 RUN mkdir -p "$HTTPD_PREFIX" \
@@ -141,6 +143,9 @@ RUN set -eux; \
 COPY httpd-foreground /usr/local/bin/
 COPY ./httpd.conf /usr/local/apache2/conf/httpd.conf
 COPY .htaccess /usr/local/apache2/htdocs/
+ADD run.sh /run.sh
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /run.sh /entrypoint.sh
 
 RUN chown -R www-data:www-data "$HTTPD_PREFIX"
 
