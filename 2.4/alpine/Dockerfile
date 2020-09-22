@@ -9,8 +9,6 @@ RUN set -x \
 # http://git.alpinelinux.org/cgit/aports/tree/main/lighttpd/lighttpd.pre-install?h=v3.3.2
 # http://git.alpinelinux.org/cgit/aports/tree/main/nginx-initscripts/nginx-initscripts.pre-install?h=v3.3.2
 
-RUN apk update && add cron
-
 ENV HTTPD_PREFIX /usr/local/apache2
 ENV PATH $HTTPD_PREFIX/bin:$PATH
 RUN mkdir -p "$HTTPD_PREFIX" \
@@ -62,6 +60,7 @@ RUN set -eux; \
 		tar \
 		# mod_deflate
 		zlib-dev \
+		cron \
 	; \
 	\
 	ddist() { \
