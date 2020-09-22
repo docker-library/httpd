@@ -1,1 +1,1 @@
-echo "working"
+echo "working" > working.txt

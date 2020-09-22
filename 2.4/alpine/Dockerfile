@@ -60,7 +60,6 @@ RUN set -eux; \
 		tar \
 		# mod_deflate
 		zlib-dev \
-		cron \
 	; \
 	\
 	ddist() { \
@@ -144,6 +143,7 @@ COPY ./httpd.conf /usr/local/apache2/conf/httpd.conf
 COPY .htaccess /usr/local/apache2/htdocs/
 ADD run.sh /run.sh
 ADD entrypoint.sh /entrypoint.sh
+
 RUN chmod +x /run.sh /entrypoint.sh
 
 RUN chown -R www-data:www-data "$HTTPD_PREFIX"
