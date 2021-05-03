@@ -151,11 +151,11 @@ RUN set -eux; \
 # Yann Ylavic <ylavic@apache.org>
 		8935926745E1CE7E3ED748F6EC99EE267EB5F61A \
 # Daniel Ruggeri (http\x3a//home.apache.org/~druggeri/) <druggeri@apache.org>
-		B9E8213AEFB861AF35A41F2C995E35221AD84DFF \
-# Daniel Ruggeri (http\x3a//home.apache.org/~druggeri/) <druggeri@apache.org>
 		E3480043595621FE56105F112AB12A7ADC55C003 \
 # Joe Orton (Release Signing Key) <jorton@apache.org>
 		93525CFCF6FDFFB3FD9700DD5A4B10AE43B56A27 \
+# Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+		C55AB7B9139EB2263CD1AABC19B033D1760C227B \
 	; do \
 		gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
 	done; \
