@@ -182,10 +182,10 @@ RUN set -eux; \
 		--prefix="$HTTPD_PREFIX" \
 		--enable-mods-shared=reallyall \
 		--enable-mpms-shared=all \
-# enable the same hardening flags as Debian
-# - https://salsa.debian.org/apache-team/apache2/blob/87db7de4e59683fb03e97900f078d06ef2292748/debian/rules#L19-21
 # - https://salsa.debian.org/apache-team/apache2/blob/87db7de4e59683fb03e97900f078d06ef2292748/debian/rules#L115
 		--enable-pie \
+# enable the same hardening flags as Debian
+# - https://salsa.debian.org/apache-team/apache2/blob/87db7de4e59683fb03e97900f078d06ef2292748/debian/rules#L19-21
 		CFLAGS="-pipe $CFLAGS" \
 		CPPFLAGS="$CPPFLAGS" \
 		LDFLAGS="-Wl,--as-needed $LDFLAGS" \
