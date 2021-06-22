@@ -156,7 +156,7 @@ RUN set -eux; \
 # Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 		C55AB7B9139EB2263CD1AABC19B033D1760C227B \
 	; do \
-		gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+		gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key"; \
 	done; \
 	gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2; \
 	command -v gpgconf && gpgconf --kill all || :; \
