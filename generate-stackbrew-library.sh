@@ -87,6 +87,19 @@ for version in "${versions[@]}"; do
 		fi
 
 		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
+
+		suite="${variantParent#*:}" # "buster-slim", "buster"
+		suite="${suite%-slim}" # "buster"
+
+		if [ "$variant" = 'alpine' ]; then
+			suite="alpine$suite" # "alpine3.8"
+			suiteAliases=( "${versionAliases[@]/%/-$suite}" )
+		else
+			suiteAliases=( "${variantAliases[@]/%/-$suite}" )
+		fi
+		suiteAliases=( "${suiteAliases[@]//latest-/}" )
+		variantAliases+=( "${suiteAliases[@]}" )
+
 		variantArches="${parentRepoToArches[$variantParent]}"
 
 		echo
