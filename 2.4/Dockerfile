@@ -223,6 +223,8 @@ RUN set -eux; \
 # https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
 STOPSIGNAL SIGWINCH
 
+ENV LANG C.UTF-8
+
 COPY httpd-foreground /usr/local/bin/
 
 EXPOSE 80
