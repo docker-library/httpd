@@ -11,16 +11,16 @@ versions=( "${versions[@]%/}" )
 
 for version in "${versions[@]}"; do
 	fullVersion="$(
-		wget -qO- "https://www-us.apache.org/dist/httpd/" \
+		wget -qO- 'https://downloads.apache.org/httpd/' \
 			| grep -E '<a href="httpd-'"$version"'[^"-]+.tar.bz2"' \
 			| sed -r 's!.*<a href="httpd-([^"-]+).tar.bz2".*!\1!' \
 			| sort -V \
 			| tail -1
 	)"
-	sha256="$(wget -qO- "https://www-us.apache.org/dist/httpd/httpd-$fullVersion.tar.bz2.sha256" | cut -d' ' -f1)"
+	sha256="$(wget -qO- "https://downloads.apache.org/httpd/httpd-$fullVersion.tar.bz2.sha256" | cut -d' ' -f1)"
 	echo "$version: $fullVersion"
 
-	patchesUrl="https://www-us.apache.org/dist/httpd/patches/apply_to_$fullVersion"
+	patchesUrl="https://downloads.apache.org/httpd/patches/apply_to_$fullVersion"
 	patches=()
 	if wget --quiet --spider -O /dev/null -o /dev/null "$patchesUrl/"; then
 		patchFiles="$(
