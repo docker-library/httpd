@@ -18,8 +18,8 @@ RUN set -eux; \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
-ENV HTTPD_VERSION 2.4.48
-ENV HTTPD_SHA256 1bc826e7b2e88108c7e4bf43c026636f77a41d849cfb667aa7b5c0b86dbf966c
+ENV HTTPD_VERSION 2.4.49
+ENV HTTPD_SHA256 65b965d6890ea90d9706595e4b7b9365b5060bec8ea723449480b4769974133b
 
 # https://httpd.apache.org/security/vulnerabilities_24.html
 ENV HTTPD_PATCHES=""
@@ -150,6 +150,8 @@ RUN set -eux; \
 		93525CFCF6FDFFB3FD9700DD5A4B10AE43B56A27 \
 # Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 		C55AB7B9139EB2263CD1AABC19B033D1760C227B \
+# Stefan Eissing (icing) <stefan@eissing.org>
+		26F51EF9A82F4ACB43F1903ED377C9E7D1944C66\
 	; do \
 		gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key"; \
 	done; \
