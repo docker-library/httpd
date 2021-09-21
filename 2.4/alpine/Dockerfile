@@ -156,6 +156,8 @@ RUN set -eux; \
 		93525CFCF6FDFFB3FD9700DD5A4B10AE43B56A27 \
 # Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 		C55AB7B9139EB2263CD1AABC19B033D1760C227B \
+# Stefan Eissing (icing) <stefan@eissing.org>
+		26F51EF9A82F4ACB43F1903ED377C9E7D1944C66\
 	; do \
 		gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key"; \
 	done; \
