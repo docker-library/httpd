@@ -14,6 +14,16 @@ RUN mkdir -p "$HTTPD_PREFIX" \
 	&& chown www-data:www-data "$HTTPD_PREFIX"
 WORKDIR $HTTPD_PREFIX
 
+# install httpd runtime dependencies
+# https://httpd.apache.org/docs/2.4/install.html#requirements
+RUN set -eux; \
+	apk add --no-cache \
+		apr \
+		apr-util \
+		apr-util-ldap \
+		perl \
+	;
+
 ENV HTTPD_VERSION 2.4.51
 ENV HTTPD_SHA256 20e01d81fecf077690a4439e3969a9b22a09a8d43c525356e863407741b838f4
 
@@ -23,14 +33,7 @@ ENV HTTPD_PATCHES=""
 # see https://httpd.apache.org/docs/2.4/install.html#requirements
 RUN set -eux; \
 	\
-	runDeps=' \
-		apr \
-		apr-util \
-		apr-util-ldap \
-		perl \
-	'; \
 	apk add --no-cache --virtual .build-deps \
-		$runDeps \
 		apr-dev \
 		apr-util-dev \
 		ca-certificates \
@@ -204,13 +207,13 @@ RUN set -eux; \
 		"$HTTPD_PREFIX/conf/extra/httpd-ssl.conf" \
 	; \
 	\
-	runDeps="$runDeps $( \
+	deps="$( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
 			| tr ',' '\n' \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
-	apk add --no-network --virtual .httpd-rundeps $runDeps; \
+	apk add --no-network --virtual .httpd-so-deps $deps; \
 	apk del --no-network .build-deps; \
 	\
 # smoke test
