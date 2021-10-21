@@ -88,11 +88,11 @@ for version in "${versions[@]}"; do
 
 		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
 
-		suite="${variantParent#*:}" # "buster-slim", "buster"
-		suite="${suite%-slim}" # "buster"
+		suite="${variantParent#*:}" # "bullseye-slim", "bullseye"
+		suite="${suite%-slim}" # "bullseye"
 
 		if [ "$variant" = 'alpine' ]; then
-			suite="alpine$suite" # "alpine3.8"
+			suite="alpine$suite" # "alpine3.14"
 			suiteAliases=( "${versionAliases[@]/%/-$suite}" )
 		else
 			suiteAliases=( "${variantAliases[@]/%/-$suite}" )
