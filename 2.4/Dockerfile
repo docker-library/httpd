@@ -203,6 +203,8 @@ RUN set -eux; \
 		-e 's!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g' \
 		-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
 		-e 's!^(\s*TransferLog)\s+\S+!\1 /proc/self/fd/1!g' \
+		-e 's!^User daemon!User www-data!g' \
+		-e 's!^Group daemon!Group www-data!g' \
 		"$HTTPD_PREFIX/conf/httpd.conf" \
 		"$HTTPD_PREFIX/conf/extra/httpd-ssl.conf" \
 	; \
