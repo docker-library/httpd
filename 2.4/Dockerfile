@@ -203,9 +203,13 @@ RUN set -eux; \
 		-e 's!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g' \
 		-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
 		-e 's!^(\s*TransferLog)\s+\S+!\1 /proc/self/fd/1!g' \
+		-e 's!^(\s*User)\s+daemon\s*$!\1 www-data!g' \
+		-e 's!^(\s*Group)\s+daemon\s*$!\1 www-data!g' \
 		"$HTTPD_PREFIX/conf/httpd.conf" \
 		"$HTTPD_PREFIX/conf/extra/httpd-ssl.conf" \
 	; \
+	grep -E '^\s*User www-data$' "$HTTPD_PREFIX/conf/httpd.conf"; \
+	grep -E '^\s*Group www-data$' "$HTTPD_PREFIX/conf/httpd.conf"; \
 	\
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
