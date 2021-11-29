@@ -92,7 +92,7 @@ for version in "${versions[@]}"; do
 		suite="${suite%-slim}" # "bullseye"
 
 		if [ "$variant" = 'alpine' ]; then
-			suite="alpine$suite" # "alpine3.14"
+			suite="alpine$suite" # "alpine3.15"
 			suiteAliases=( "${versionAliases[@]/%/-$suite}" )
 		else
 			suiteAliases=( "${variantAliases[@]/%/-$suite}" )
