@@ -15,6 +15,8 @@ RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 		libaprutil1-ldap \
+# https://github.com/docker-library/httpd/issues/209
+		libldap-common \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
