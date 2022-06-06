@@ -21,6 +21,8 @@ RUN set -eux; \
 		apr \
 		apr-util \
 		apr-util-ldap \
+# https://github.com/docker-library/httpd/issues/214
+		ca-certificates \
 		perl \
 	;
 
@@ -36,7 +38,6 @@ RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
 		apr-dev \
 		apr-util-dev \
-		ca-certificates \
 		coreutils \
 		dpkg-dev dpkg \
 		gcc \

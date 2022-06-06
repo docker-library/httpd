@@ -14,6 +14,8 @@ WORKDIR $HTTPD_PREFIX
 RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
+# https://github.com/docker-library/httpd/issues/214
+		ca-certificates \
 		libaprutil1-ldap \
 # https://github.com/docker-library/httpd/issues/209
 		libldap-common \
@@ -35,7 +37,6 @@ RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 		bzip2 \
-		ca-certificates \
 		dirmngr \
 		dpkg-dev \
 		gcc \
