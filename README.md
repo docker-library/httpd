@@ -14,7 +14,7 @@ For outstanding `httpd` image PRs, check [PRs with the "library/httpd" label on 
 
 ---
 
--	[![build status badge](https://img.shields.io/github/workflow/status/docker-library/httpd/GitHub%20CI/master?label=GitHub%20CI)](https://github.com/docker-library/httpd/actions?query=workflow%3A%22GitHub+CI%22+branch%3Amaster)
+-	[![build status badge](https://img.shields.io/github/actions/workflow/status/docker-library/httpd/ci.yml?branch=master&label=GitHub%20CI)](https://github.com/docker-library/httpd/actions?query=workflow%3A%22GitHub+CI%22+branch%3Amaster)
 -	[![build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/update.sh/job/httpd.svg?label=Automated%20update.sh)](https://doi-janky.infosiftr.net/job/update.sh/job/httpd/)
 
 | Build | Status | Badges | (per-arch) |
