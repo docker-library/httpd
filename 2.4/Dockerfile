@@ -37,7 +37,6 @@ RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 		bzip2 \
-		dirmngr \
 		dpkg-dev \
 		gcc \
 		gnupg \
@@ -159,7 +158,7 @@ RUN set -eux; \
 		gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key"; \
 	done; \
 	gpg --batch --verify httpd.tar.bz2.asc httpd.tar.bz2; \
-	command -v gpgconf && gpgconf --kill all || :; \
+	gpgconf --kill all; \
 	rm -rf "$GNUPGHOME" httpd.tar.bz2.asc; \
 	\
 	mkdir -p src; \
