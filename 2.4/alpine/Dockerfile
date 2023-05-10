@@ -30,7 +30,7 @@ ENV HTTPD_VERSION 2.4.57
 ENV HTTPD_SHA256 dbccb84aee95e095edfbb81e5eb926ccd24e6ada55dcd83caecb262e5cf94d2a
 
 # https://httpd.apache.org/security/vulnerabilities_24.html
-ENV HTTPD_PATCHES=""
+ENV HTTPD_PATCHES="rewrite-windows-testchar-h.patch 1d5620574fa03b483262dc5b9a66a6906553389952ab5d3070a02f887cc20193"
 
 # see https://httpd.apache.org/docs/2.4/install.html#requirements
 RUN set -eux; \
@@ -43,6 +43,7 @@ RUN set -eux; \
 		gcc \
 		gnupg \
 		libc-dev \
+		patch \
 		# mod_md
 		curl-dev \
 		jansson-dev \
