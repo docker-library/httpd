@@ -88,8 +88,8 @@ for version in "${versions[@]}"; do
 
 		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
 
-		suite="${variantParent#*:}" # "bullseye-slim", "bullseye"
-		suite="${suite%-slim}" # "bullseye"
+		suite="${variantParent#*:}" # "bookworm-slim", "bookworm"
+		suite="${suite%-slim}" # "bookworm"
 
 		if [ "$variant" = 'alpine' ]; then
 			suite="alpine$suite" # "alpine3.15"
