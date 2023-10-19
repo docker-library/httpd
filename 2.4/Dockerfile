@@ -22,11 +22,11 @@ RUN set -eux; \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
-ENV HTTPD_VERSION 2.4.57
-ENV HTTPD_SHA256 dbccb84aee95e095edfbb81e5eb926ccd24e6ada55dcd83caecb262e5cf94d2a
+ENV HTTPD_VERSION 2.4.58
+ENV HTTPD_SHA256 fa16d72a078210a54c47dd5bef2f8b9b8a01d94909a51453956b3ec6442ea4c5
 
 # https://httpd.apache.org/security/vulnerabilities_24.html
-ENV HTTPD_PATCHES="rewrite-windows-testchar-h.patch 1d5620574fa03b483262dc5b9a66a6906553389952ab5d3070a02f887cc20193"
+ENV HTTPD_PATCHES=""
 
 # see https://httpd.apache.org/docs/2.4/install.html#requirements
 RUN set -eux; \
