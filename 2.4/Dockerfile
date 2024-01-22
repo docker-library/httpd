@@ -1,5 +1,8 @@
 FROM debian:bookworm-slim
 
+# SOURCE_DATE_EPOCH is consumed by build scripts
+ARG SOURCE_DATE_EPOCH
+
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 #RUN groupadd -r www-data && useradd -r --create-home -g www-data www-data
 
@@ -20,7 +23,9 @@ RUN set -eux; \
 # https://github.com/docker-library/httpd/issues/209
 		libldap-common \
 	; \
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/apt/lists/* ; \
+# clean up for reproducibility
+	rm -rf /var/log/* /var/cache/ldconfig/aux-cache
 
 ENV HTTPD_VERSION 2.4.58
 ENV HTTPD_SHA256 fa16d72a078210a54c47dd5bef2f8b9b8a01d94909a51453956b3ec6442ea4c5
@@ -68,7 +73,7 @@ RUN set -eux; \
 # if the version is outdated, we have to pull from the archive
 			https://archive.apache.org/dist/ \
 		; do \
-			if wget -O "$f" "$distUrl$distFile" && [ -s "$f" ]; then \
+			if wget --no-hsts -O "$f" "$distUrl$distFile" && [ -s "$f" ]; then \
 				success=1; \
 				break; \
 			fi; \
@@ -225,7 +230,9 @@ RUN set -eux; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	\
 # smoke test
-	httpd -v
+	httpd -v; \
+# clean up for reproducibility
+	rm -rf /var/log/* /var/cache/ldconfig/aux-cache
 
 # https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
 STOPSIGNAL SIGWINCH

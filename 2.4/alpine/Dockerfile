@@ -1,5 +1,8 @@
 FROM alpine:3.19
 
+# SOURCE_DATE_EPOCH is consumed by build scripts
+ARG SOURCE_DATE_EPOCH
+
 # ensure www-data user exists
 RUN set -x \
 	&& adduser -u 82 -D -S -G www-data www-data
@@ -35,7 +38,7 @@ ENV HTTPD_PATCHES=""
 # see https://httpd.apache.org/docs/2.4/install.html#requirements
 RUN set -eux; \
 	\
-	apk add --no-cache --virtual .build-deps \
+	apk add --no-cache --virtual .build-deps=0 \
 		apr-dev \
 		apr-util-dev \
 		coreutils \
@@ -219,7 +222,7 @@ RUN set -eux; \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
-	apk add --no-network --virtual .httpd-so-deps $deps; \
+	apk add --no-network --virtual .httpd-so-deps=0 $deps; \
 	apk del --no-network .build-deps; \
 	\
 # smoke test
