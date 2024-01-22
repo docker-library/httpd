@@ -1,5 +1,9 @@
 FROM debian:bookworm-slim
 
+# The global SOURCE_DATE_EPOCH is consumed by commands that are not associated with a source artifact.
+# This is not propagated from --build-arg: https://github.com/moby/buildkit/issues/4576#issuecomment-2159501282
+ENV SOURCE_DATE_EPOCH 0
+
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 #RUN groupadd -r www-data && useradd -r --create-home -g www-data www-data
 
@@ -20,7 +24,9 @@ RUN set -eux; \
 # https://github.com/docker-library/httpd/issues/209
 		libldap-common \
 	; \
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/apt/lists/* ; \
+# clean up for reproducibility
+	rm -rf /var/log/* /var/cache/ldconfig/aux-cache
 
 ENV HTTPD_VERSION 2.4.62
 ENV HTTPD_SHA256 674188e7bf44ced82da8db522da946849e22080d73d16c93f7f4df89e25729ec
@@ -68,7 +74,7 @@ RUN set -eux; \
 # if the version is outdated, we have to pull from the archive
 			https://archive.apache.org/dist/ \
 		; do \
-			if wget -O "$f" "$distUrl$distFile" && [ -s "$f" ]; then \
+			if wget --no-hsts -O "$f" "$distUrl$distFile" && [ -s "$f" ]; then \
 				success=1; \
 				break; \
 			fi; \
@@ -170,7 +176,7 @@ RUN set -eux; \
 			local patchSha256="$1"; shift; \
 			ddist "$patchFile" "httpd/patches/apply_to_$HTTPD_VERSION/$patchFile"; \
 			echo "$patchSha256 *$patchFile" | sha256sum -c -; \
-			patch -p0 < "$patchFile"; \
+			patch --set-utc --force -p0 < "$patchFile"; \
 			rm -f "$patchFile"; \
 		done; \
 	}; \
@@ -180,6 +186,10 @@ RUN set -eux; \
 	CFLAGS="$(dpkg-buildflags --get CFLAGS)"; \
 	CPPFLAGS="$(dpkg-buildflags --get CPPFLAGS)"; \
 	LDFLAGS="$(dpkg-buildflags --get LDFLAGS)"; \
+	SOURCE_DATE_EPOCH="$(find . -type f -exec stat -c '%Y' {} + | sort -nr | head -n1)"; \
+	export SOURCE_DATE_EPOCH; \
+# for logging validation/edification
+	date --date "@$SOURCE_DATE_EPOCH" --rfc-2822; \
 	./configure \
 		--build="$gnuArch" \
 		--prefix="$HTTPD_PREFIX" \
@@ -225,7 +235,9 @@ RUN set -eux; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	\
 # smoke test
-	httpd -v
+	httpd -v; \
+# clean up for reproducibility
+	rm -rf /var/log/* /var/cache/ldconfig/aux-cache
 
 # https://httpd.apache.org/docs/2.4/stopping.html#gracefulstop
 STOPSIGNAL SIGWINCH
