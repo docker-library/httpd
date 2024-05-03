@@ -50,7 +50,7 @@ RUN set -eux; \
 		# mod_proxy_html mod_xml2enc
 		libxml2-dev \
 		# mod_lua
-		lua-dev \
+		lua5.4-dev \
 		make \
 		# mod_http2
 		nghttp2-dev \
