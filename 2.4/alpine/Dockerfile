@@ -26,8 +26,8 @@ RUN set -eux; \
 		perl \
 	;
 
-ENV HTTPD_VERSION 2.4.61
-ENV HTTPD_SHA256 ea8ba86fd95bd594d15e46d25ac5bbda82ae0c9122ad93998cc539c133eaceb6
+ENV HTTPD_VERSION 2.4.62
+ENV HTTPD_SHA256 674188e7bf44ced82da8db522da946849e22080d73d16c93f7f4df89e25729ec
 
 # https://httpd.apache.org/security/vulnerabilities_24.html
 ENV HTTPD_PATCHES=""
