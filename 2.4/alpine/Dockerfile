@@ -1,5 +1,9 @@
 FROM alpine:3.20
 
+# The global SOURCE_DATE_EPOCH is consumed by commands that are not associated with a source artifact.
+# This is not propagated from --build-arg: https://github.com/moby/buildkit/issues/4576#issuecomment-2159501282
+ENV SOURCE_DATE_EPOCH 0
+
 # ensure www-data user exists
 RUN set -x \
 	&& adduser -u 82 -D -S -G www-data www-data
@@ -35,7 +39,7 @@ ENV HTTPD_PATCHES=""
 # see https://httpd.apache.org/docs/2.4/install.html#requirements
 RUN set -eux; \
 	\
-	apk add --no-cache --virtual .build-deps \
+	apk add --no-cache --virtual .build-deps=0 \
 		apr-dev \
 		apr-util-dev \
 		coreutils \
@@ -181,13 +185,17 @@ RUN set -eux; \
 			local patchSha256="$1"; shift; \
 			ddist "$patchFile" "httpd/patches/apply_to_$HTTPD_VERSION/$patchFile"; \
 			echo "$patchSha256 *$patchFile" | sha256sum -c -; \
-			patch -p0 < "$patchFile"; \
+			patch --set-utc --force -p0 < "$patchFile"; \
 			rm -f "$patchFile"; \
 		done; \
 	}; \
 	patches $HTTPD_PATCHES; \
 	\
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+	SOURCE_DATE_EPOCH="$(find . -type f -exec stat -c '%Y' {} + | sort -nr | head -n1)"; \
+	export SOURCE_DATE_EPOCH; \
+# for logging validation/edification
+	date --date "@$SOURCE_DATE_EPOCH" --rfc-2822; \
 	./configure \
 		--build="$gnuArch" \
 		--prefix="$HTTPD_PREFIX" \
@@ -219,7 +227,7 @@ RUN set -eux; \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
-	apk add --no-network --virtual .httpd-so-deps $deps; \
+	apk add --no-network --virtual .httpd-so-deps=0 $deps; \
 	apk del --no-network .build-deps; \
 	\
 # smoke test
