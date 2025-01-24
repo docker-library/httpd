@@ -22,8 +22,8 @@ RUN set -eux; \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
-ENV HTTPD_VERSION 2.4.62
-ENV HTTPD_SHA256 674188e7bf44ced82da8db522da946849e22080d73d16c93f7f4df89e25729ec
+ENV HTTPD_VERSION 2.4.63
+ENV HTTPD_SHA256 88fc236ab99b2864b248de7d49a008ec2afd7551e64dce8b95f58f32f94c46ab
 
 # https://httpd.apache.org/security/vulnerabilities_24.html
 ENV HTTPD_PATCHES=""
