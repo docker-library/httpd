@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 #RUN groupadd -r www-data && useradd -r --create-home -g www-data www-data
@@ -12,15 +12,14 @@ WORKDIR $HTTPD_PREFIX
 # install httpd runtime dependencies
 # https://httpd.apache.org/docs/2.4/install.html#requirements
 RUN set -eux; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
+	apt-get install --update -y --no-install-recommends \
 # https://github.com/docker-library/httpd/issues/214
 		ca-certificates \
 		libaprutil1-ldap \
 # https://github.com/docker-library/httpd/issues/209
 		libldap-common \
 	; \
-	rm -rf /var/lib/apt/lists/*
+	apt-get dist-clean
 
 ENV HTTPD_VERSION 2.4.65
 ENV HTTPD_SHA256 58b8be97d9940ec17f7656c0c6b9f41b618aac468b894b534148e3296c53b8b3
@@ -34,8 +33,7 @@ RUN set -eux; \
 	# mod_http2 mod_lua mod_proxy_html mod_xml2enc
 	# https://anonscm.debian.org/cgit/pkg-apache/apache2.git/tree/debian/control?id=adb6f181257af28ee67af15fc49d2699a0080d4c
 	savedAptMark="$(apt-mark showmanual)"; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
+	apt-get install --update -y --no-install-recommends \
 		bzip2 \
 		dpkg-dev \
 		gcc \
@@ -47,7 +45,7 @@ RUN set -eux; \
 		libjansson-dev \
 		liblua5.2-dev \
 		libnghttp2-dev \
-		libpcre3-dev \
+		libpcre2-dev \
 		libssl-dev \
 		libxml2-dev \
 		make \
@@ -55,7 +53,6 @@ RUN set -eux; \
 		wget \
 		zlib1g-dev \
 	; \
-	rm -r /var/lib/apt/lists/*; \
 	\
 	ddist() { \
 		local f="$1"; shift; \
@@ -223,6 +220,7 @@ RUN set -eux; \
 		| xargs -r apt-mark manual \
 	; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	apt-get dist-clean; \
 	\
 # smoke test
 	httpd -v
